@@ -14,14 +14,6 @@ class DriveApp : Application() {
         val SHARED_PREF_NAME = "DriveApp"
 
         val YA_ID = "85820f69416b4c99a807bd5184ce45f3"
-        val YA_PASS = "ebadfad59dcd4857808ec0a346f824da"
-        val ACCOUNT_TYPE = "com.yandex"
-        val AUTH_URL = "https://oauth.yandex.ru/authorize?response_type=token&client_id=$YA_ID"
-        private val ACTION_ADD_ACCOUNT = "com.yandex.intent.ADD_ACCOUNT"
-        private val KEY_CLIENT_SECRET = "clientSecret"
-
-        var USERNAME = "example.username"
-        var TOKEN = "example.token"
 
         lateinit var INSTANCE: DriveApp
 

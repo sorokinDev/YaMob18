@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">YaMob2018</string>
+    <string name="title_all_photos">Фото</string>
+    <string name="title_offline">Офлайн</string>
+    <string name="title_settings">Настройки</string>
+    <string name="hint_auth_needed">Вам необходимо войти в аккаунт Яндекс, чтобы получить доступ к диску</string>
+    <string name="login">Войти</string>
+    <string name="btn_signout">Выйти</string>
+    <string name="get_extra_space">Получить больше места</string>
+    <string name="available_space">Свободно: %1$.2f из %2$.2f ГБ</string>
+    <string name="title_auth_failure">Авторизация</string>
+</resources>

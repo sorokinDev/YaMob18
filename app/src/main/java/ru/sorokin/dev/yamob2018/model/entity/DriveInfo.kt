@@ -7,10 +7,9 @@ import io.realm.annotations.RealmClass
 import io.realm.annotations.Required
 
 @RealmClass
-open class AccountInfo(
-        @SerializedName("login") var login: String = "",
-        @SerializedName("id") var id: String = "",
+open class DriveInfo(
         @PrimaryKey @Required var token: String = "",
-        @SerializedName("is_avatar_empty") var isAvatarEmpty: Boolean = true,
-        @SerializedName("default_avatar_id") var avatarId: String = ""
+        @SerializedName("trash_size") var trashSize: Long = 0,
+        @SerializedName("total_space") var totalSpace: Long = 0,
+        @SerializedName("used_space") var usedSpace: Long = 0
 ) : RealmModel

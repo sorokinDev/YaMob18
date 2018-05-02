@@ -1,5 +1,6 @@
 package ru.sorokin.dev.yamob2018.view
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
@@ -27,30 +28,37 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
     val navigator = MainNavigator(this, supportFragmentManager, containerId)
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
+        //super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_YA_LOGIN) {
-            try {
-
-                viewModel.onAuth(resultCode, data)
-
-            } catch (e: YandexAuthException) {
-                Log.e("AUTH", e.message)
+            if(resultCode == Activity.RESULT_OK && data != null){
+                try {
+                    viewModel.onAuth(resultCode, data)
+                } catch (e: YandexAuthException) {
+                    Log.e("AUTH", e.message)
+                    viewModel.onAuthError()
+                }
+            }else{
                 viewModel.onAuthError()
             }
-
-            return
         }
-        super.onActivityResult(requestCode, resultCode, data)
+
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+
         val screenName = when (item.itemId) {
             R.id.navigation_feed -> Screens.FEED
             R.id.navigation_offline -> Screens.OFFLINE
-            R.id.navigation_account -> Screens.ACCOUNT
+            R.id.navigation_settings -> Screens.ACCOUNT
             else -> Screens.FEED
         }
-        viewModel.router.newRootScreen(screenName)
+
+        if(screenName == viewModel.bottomMenuSelectedItem.value){
+            return@OnNavigationItemSelectedListener true
+        }
+
+        viewModel.navTo(screenName)
 
         return@OnNavigationItemSelectedListener true
     }
@@ -66,10 +74,14 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
                 val newSelected = when(it){
                     Screens.FEED -> R.id.navigation_feed
                     Screens.OFFLINE -> R.id.navigation_offline
-                    Screens.ACCOUNT -> R.id.navigation_account
+                    Screens.ACCOUNT -> R.id.navigation_settings
                     else -> R.id.navigation_feed
                 }
-                navigation.selectedItemId = newSelected
+                if(navigation.selectedItemId != newSelected){
+                    navigation.selectedItemId = newSelected
+                }
+
+                viewModel.router.newRootScreen(it)
             }
         }
 

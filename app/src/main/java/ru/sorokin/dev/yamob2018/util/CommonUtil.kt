@@ -8,9 +8,8 @@ import android.arch.lifecycle.LiveData
 import com.bumptech.glide.annotation.GlideModule
 import io.realm.RealmModel
 import com.bumptech.glide.module.AppGlideModule
-
-
-
+import io.realm.kotlin.addChangeListener
+import io.realm.kotlin.removeChangeListener
 
 
 fun <T> mutableLiveDataWithValue(v: T): MutableLiveData<T> = MutableLiveData<T>().apply { value = v }
@@ -30,5 +29,24 @@ class RealmLiveData<T : RealmModel>(private val results: RealmResults<T>) : Live
     }
 }
 
+class RealmSingleLiveData<T : RealmModel>(private val result: T) : LiveData<T>() {
+    private val listener = RealmChangeListener<T> { res -> value = res }
+    override fun onActive() {
+        result.addChangeListener(listener)
+    }
+
+    override fun onInactive() {
+        result.removeChangeListener(listener)
+    }
+}
+
 @GlideModule
 class MyAppGlideModule : AppGlideModule()
+
+object ConvertUtils{
+    val BYTES_IN_ONE_GB = 1073741824
+
+    fun bytesToGbs(bytes: Long): Double{
+        return bytes.toDouble() / BYTES_IN_ONE_GB
+    }
+}

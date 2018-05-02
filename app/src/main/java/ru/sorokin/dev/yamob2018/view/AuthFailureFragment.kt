@@ -15,7 +15,7 @@ class AuthFailureFragment : BaseFragmentWithVM<AuthFailureViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setSupportActionBar(toolbar)
-        (activity as MainActivity).title = "Login"
+        (activity as MainActivity).setTitle(R.string.title_auth_failure)
 
         btn_login.setOnClickListener {
             (activity as MainActivity).viewModel.navToAuth()

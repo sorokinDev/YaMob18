@@ -5,7 +5,10 @@ import com.google.gson.GsonBuilder
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 import io.realm.Realm
-import retrofit.converter.GsonConverter
+import io.realm.RealmResults
+import io.realm.kotlin.isValid
+import io.realm.kotlin.load
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,13 +18,13 @@ import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
 import ru.sorokin.dev.yamob2018.model.rest.AccountApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
+import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
+import ru.sorokin.dev.yamob2018.model.rest.Providers
 
 
 class AccountRepo {
     companion object {
-        var username: String? = null
-            get() = DriveApp.preferences.getString(Pref.USERNAME, null)
-
         var token: String? = null
             get() = DriveApp.preferences.getString(Pref.TOKEN, null)
 
@@ -32,42 +35,42 @@ class AccountRepo {
     var authSdk: YandexAuthSdk = YandexAuthSdk(DriveApp.INSTANCE.applicationContext, YandexAuthOptions(DriveApp.INSTANCE.applicationContext, true))
     var realm = Realm.getDefaultInstance()
 
-    fun getAccountInfo(refreshAnyway: Boolean = false){
-        var currentAcc = realm.where(AccountInfo::class.java).equalTo("token", AccountRepo.token).findFirst()
+    fun getAccountInfo(refreshAnyway: Boolean = false): RealmResults<AccountInfo>{
+        val accRes = realm.where(AccountInfo::class.java).equalTo("token", AccountRepo.token).findAllAsync()
 
-        if(currentAcc != null && !refreshAnyway){
-            return
+        val currentAcc = accRes.firstOrNull()
+        if(currentAcc != null && currentAcc.id != "" && !refreshAnyway){
+            return accRes
         }
 
+        var accountApi = Providers.provideAccountApi()
 
+        accountApi.getAccountInfo().enqueue(object : BaseCallback<AccountInfo>() {
+            override val toastOnFailure: String? = null
+            override val snackOnFailure: String? = "No internet"
 
-        realm.executeTransaction {
-            it.where(AccountInfo::class.java).findAll().deleteAllFromRealm()
-        }
-
-
-        var accountApi = Retrofit.Builder()
-                .baseUrl(AccountApi.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build().create(AccountApi::class.java)
-
-        accountApi.getAccountInfo("OAuth " + AccountRepo.token!!).enqueue(object : Callback<AccountInfo> {
-            override fun onFailure(call: Call<AccountInfo>?, t: Throwable?) {
-
+            override fun onSucceessResponse(call: Call<AccountInfo>, response: Response<AccountInfo>) {
+                response.body()?.let { acc ->
+                    acc.token = AccountRepo.token!!
+                    realm.executeTransaction {realm ->
+                        realm.insertOrUpdate(acc)
+                    }
+                }
             }
 
-            override fun onResponse(call: Call<AccountInfo>?, response: Response<AccountInfo>?) {
-                if(response!!.isSuccessful && response.body() != null){
-                    currentAcc = response.body()
-                    currentAcc?.token = AccountRepo.token!!
-                    Log.i("ACCOUNT", currentAcc?.login)
-                    realm.executeTransaction {
-                        it.insert(currentAcc)
-                    }
+            override fun onBadResponse(call: Call<AccountInfo>, response: Response<AccountInfo>) {
 
-                }
             }
         })
 
+        return accRes
+    }
+
+    fun signOut(){
+        realm.executeTransaction {
+            it.where(AccountInfo::class.java).equalTo("token", AccountRepo.token).findAll().deleteAllFromRealm()
+            it.where(DriveInfo::class.java).equalTo("token", AccountRepo.token).findAll().deleteAllFromRealm()
+        }
+        DriveApp.preferences.edit().remove(Pref.TOKEN).apply()
     }
 }

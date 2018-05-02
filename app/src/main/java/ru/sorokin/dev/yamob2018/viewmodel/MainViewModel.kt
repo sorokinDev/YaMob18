@@ -7,6 +7,7 @@ import com.yandex.authsdk.YandexAuthToken
 import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.Pref
 import ru.sorokin.dev.yamob2018.Screens
+import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
 import ru.sorokin.dev.yamob2018.viewmodel.base.BaseViewModel
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 
@@ -32,7 +33,7 @@ class MainViewModel: BaseViewModel() {
     }
 
     fun navToStart() {
-        navTo(Screens.FEED)
+        navTo(Screens.ACCOUNT)
     }
 
     fun navTo(screenName : String) {
@@ -44,6 +45,10 @@ class MainViewModel: BaseViewModel() {
         if (yandexAuthToken != null) {
 
             DriveApp.preferences.edit().putString(Pref.TOKEN, yandexAuthToken.value).apply()
+            auth.realm.executeTransaction {
+                it.delete(AccountInfo::class.java)
+                it.insertOrUpdate(AccountInfo(token = yandexAuthToken.value))
+            }
 
             auth.getAccountInfo(true)
 

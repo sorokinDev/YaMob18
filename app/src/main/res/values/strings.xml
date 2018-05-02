@@ -1,9 +1,16 @@
 <resources>
     <string name="app_name">YaMob2018</string>
-    <string name="title_feed">Feed</string>
+    <string name="title_all_photos">Images</string>
     <string name="title_offline">Offline</string>
-    <string name="title_account">Account</string>
+    <string name="title_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_auth_needed">You should authenticate to your Yandex account to get access to your drive.</string>
+    <string name="login">Log in</string>
+    <string name="btn_signout">Sign out</string>
+    <string name="get_extra_space">Get more space</string>
+    <string name="available_space">Available: %1$.2f of %2$.2f GB</string>
+
+    <string name="url_get_extra_space" translatable="false">https://disk.yandex.ru/pay</string>
+    <string name="title_auth_failure">Authorization</string>
 </resources>

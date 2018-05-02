@@ -1,15 +1,13 @@
 package ru.sorokin.dev.yamob2018.util
 
 import android.support.design.widget.Snackbar
-import android.support.graphics.drawable.AnimationUtilsCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.util.Log
-import android.view.animation.Animation
 import ru.sorokin.dev.yamob2018.Screens
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
-import ru.sorokin.dev.yamob2018.view.AccountFragment
+import ru.sorokin.dev.yamob2018.view.SettingsFragment
 import ru.sorokin.dev.yamob2018.view.AuthFailureFragment
 import ru.sorokin.dev.yamob2018.view.MainActivity
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
@@ -31,7 +29,7 @@ class MainNavigator(val activity: MainActivity, supportFragmentManager: Fragment
         val fr: Fragment? = when(screenKey!!){
             Screens.FEED -> Fragment()
             Screens.OFFLINE -> Fragment()
-            Screens.ACCOUNT -> AccountFragment.newInstance()
+            Screens.ACCOUNT -> SettingsFragment.newInstance()
             Screens.AUTH_FAILURE -> AuthFailureFragment.newInstance()
             else -> null
         }
@@ -43,7 +41,7 @@ class MainNavigator(val activity: MainActivity, supportFragmentManager: Fragment
             //Log.e("NAVIGATOR", "unknown screen error")
             return
         }
-        if((command as Forward).screenKey == Screens.AUTH){
+        if((command is Forward) && command.screenKey == Screens.AUTH){
             Log.i("AUTH", "Starting ya login intent")
             activity.startActivityForResult(activity.viewModel.auth.authSdk.createLoginIntent(activity, AccountRepo.SCOPES), MainActivity.REQUEST_CODE_YA_LOGIN)
         }

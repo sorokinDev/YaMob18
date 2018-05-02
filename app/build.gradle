@@ -47,8 +47,9 @@ dependencies {
     // Cicerone
     implementation 'ru.terrakok.cicerone:cicerone:3.0.0'
 
-    //Yandex.Drive SDK
-    implementation 'com.yandex.android:disk-restapi-sdk:1.0'
+    //Not used, retrofit interface myself
+    // Yandex.Drive SDK
+    // implementation 'com.yandex.android:disk-restapi-sdk:1.0'
 
     //Yandex.Passport SDK
     implementation "com.yandex.android:authsdk:2.1.0"
