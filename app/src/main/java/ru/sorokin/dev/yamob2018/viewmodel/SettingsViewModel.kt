@@ -26,7 +26,7 @@ class SettingsViewModel: BaseFragmentViewModel() {
 
     fun signout(){
         accountRepo.signOut()
-        router.newRootScreen(Screens.AUTH_FAILURE)
+
     }
 
 

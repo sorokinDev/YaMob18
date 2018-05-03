@@ -5,9 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.multidex.MultiDex
 import io.realm.Realm
-import ru.terrakok.cicerone.Cicerone
-import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
 
 class DriveApp : Application() {
     override fun attachBaseContext(base: Context?) {
@@ -26,25 +23,12 @@ class DriveApp : Application() {
             get() = INSTANCE.getSharedPreferences(DriveApp.SHARED_PREF_NAME, Context.MODE_PRIVATE)
     }
 
-    private lateinit var cicerone: Cicerone<Router>
-
-    val router: Router
-        get() = cicerone.router
-
-    val navigatorHolder: NavigatorHolder
-        get() = cicerone.navigatorHolder
-
     override fun onCreate() {
         super.onCreate()
 
         INSTANCE = this
 
-        initCicerone()
-
         Realm.init(applicationContext)
     }
 
-    private fun initCicerone() {
-        cicerone = Cicerone.create()
-    }
 }

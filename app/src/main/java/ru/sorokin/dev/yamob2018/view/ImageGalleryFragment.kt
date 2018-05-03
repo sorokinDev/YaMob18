@@ -29,6 +29,11 @@ import ru.sorokin.dev.yamob2018.util.observe
 
 
 class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("RVPOS", rvLayoutManager.findFirstVisibleItemPosition())
+
+    }
 
 
     companion object {
@@ -46,6 +51,7 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
         (activity as MainActivity).setSupportActionBar(toolbar)
         (activity as MainActivity).setTitle(R.string.title_all_photos)
+
 
         rv_images.setHasFixedSize(true)
         rvLayoutManager = GridLayoutManager(context, Math.max(3, rv_images.width    / 100))
@@ -68,6 +74,12 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
         if(savedInstanceState == null){
             viewModel.loadImages(20, 0, true, "S", "-modified")
+        }
+
+        if(savedInstanceState != null){
+            rvLayoutManager.scrollToPosition(savedInstanceState.getInt("RVPOS"))
+            Log.i("RVPOS", savedInstanceState.getInt("RVPOS").toString())
+
         }
 
 

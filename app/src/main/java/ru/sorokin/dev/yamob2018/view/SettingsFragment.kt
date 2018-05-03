@@ -75,6 +75,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         if(id == R.id.action_signout){
             //TODO: add confirmation dialog
             viewModel.signout()
+            (activity as MainActivity).viewModel.updateUI(true)
             return true
         } else {
             return super.onOptionsItemSelected(item)

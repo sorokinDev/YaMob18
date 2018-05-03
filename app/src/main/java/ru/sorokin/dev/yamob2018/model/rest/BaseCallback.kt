@@ -13,7 +13,7 @@ abstract class BaseCallback<T> : Callback<T> {
 
     override fun onFailure(call: Call<T>?, t: Throwable?) {
         if(snackOnFailure != null){
-            DriveApp.INSTANCE.router.showSystemMessage(snackOnFailure)
+
         }else if(toastOnFailure != null){
             Toast.makeText(DriveApp.INSTANCE.applicationContext, toastOnFailure, Toast.LENGTH_SHORT).show()
         }

@@ -47,7 +47,7 @@ dependencies {
     kapt "android.arch.lifecycle:compiler:1.1.1"
 
     // Cicerone
-    implementation 'ru.terrakok.cicerone:cicerone:3.0.0'
+    //implementation 'ru.terrakok.cicerone:cicerone:3.0.0'
 
     //Not used, retrofit interface myself
     // Yandex.Drive SDK
@@ -66,6 +66,9 @@ dependencies {
 
     //Realm adapters
     implementation 'io.realm:android-adapters:2.1.1'
+
+    //For nice navigation
+    implementation 'com.ncapdevi:frag-nav:2.4.0'
 
     implementation 'com.android.support:multidex:1.0.3'
 
