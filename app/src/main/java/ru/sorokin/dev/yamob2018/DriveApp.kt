@@ -3,12 +3,17 @@ package ru.sorokin.dev.yamob2018
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.support.multidex.MultiDex
 import io.realm.Realm
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 
 class DriveApp : Application() {
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
+    }
 
     companion object {
         val SHARED_PREF_NAME = "DriveApp"

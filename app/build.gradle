@@ -19,6 +19,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         manifestPlaceholders = [YANDEX_CLIENT_ID: "85820f69416b4c99a807bd5184ce45f3"]
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -30,6 +31,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
@@ -61,6 +63,11 @@ dependencies {
     //Glide for images
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     kapt 'com.github.bumptech.glide:compiler:4.7.1'
+
+    //Realm adapters
+    implementation 'io.realm:android-adapters:2.1.1'
+
+    implementation 'com.android.support:multidex:1.0.3'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

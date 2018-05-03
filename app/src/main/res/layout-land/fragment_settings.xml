@@ -36,25 +36,22 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/iv_avatar"
+                app:layout_constraintStart_toStartOf="@+id/iv_avatar"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="account.name" />
 
             <ImageView
                 android:id="@+id/iv_avatar"
-                android:layout_width="188dp"
-                android:layout_height="188dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="168dp"
+                android:layout_height="168dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/circle_account"
                 android:padding="4dp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_username" />
 
@@ -62,13 +59,10 @@
                 android:id="@+id/tv_available_space"
                 style="@style/Base.TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
+                android:layout_height="23dp"
                 android:text="@string/available_space"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_avatar" />
+                app:layout_constraintStart_toStartOf="@+id/pb_available_space"
+                app:layout_constraintTop_toTopOf="@+id/iv_avatar" />
 
             <ProgressBar
                 android:id="@+id/pb_available_space"
@@ -82,7 +76,7 @@
                 android:max="100"
                 android:scaleY="2"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/iv_avatar"
                 app:layout_constraintTop_toBottomOf="@+id/tv_available_space" />
 
             <Button
@@ -96,8 +90,8 @@
                 android:layout_marginStart="8dp"
                 android:text="@string/get_extra_space"
                 android:textColor="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/pb_available_space"
+                app:layout_constraintStart_toStartOf="@+id/pb_available_space"
                 app:layout_constraintTop_toBottomOf="@+id/pb_available_space" />
 
             <!-- <Button

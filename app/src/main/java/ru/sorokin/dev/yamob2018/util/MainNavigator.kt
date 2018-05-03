@@ -9,6 +9,7 @@ import ru.sorokin.dev.yamob2018.Screens
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 import ru.sorokin.dev.yamob2018.view.SettingsFragment
 import ru.sorokin.dev.yamob2018.view.AuthFailureFragment
+import ru.sorokin.dev.yamob2018.view.ImageGalleryFragment
 import ru.sorokin.dev.yamob2018.view.MainActivity
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -27,7 +28,7 @@ class MainNavigator(val activity: MainActivity, supportFragmentManager: Fragment
 
     override fun createFragment(screenKey: String?, data: Any?): Fragment? {
         val fr: Fragment? = when(screenKey!!){
-            Screens.FEED -> Fragment()
+            Screens.FEED -> ImageGalleryFragment.newInstance()
             Screens.OFFLINE -> Fragment()
             Screens.ACCOUNT -> SettingsFragment.newInstance()
             Screens.AUTH_FAILURE -> AuthFailureFragment.newInstance()

@@ -33,7 +33,7 @@ class MainViewModel: BaseViewModel() {
     }
 
     fun navToStart() {
-        navTo(Screens.ACCOUNT)
+        navTo(Screens.FEED)
     }
 
     fun navTo(screenName : String) {
