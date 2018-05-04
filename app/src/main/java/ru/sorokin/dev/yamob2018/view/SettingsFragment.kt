@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_settings.*
 import ru.sorokin.dev.yamob2018.R
+import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 import ru.sorokin.dev.yamob2018.util.ConvertUtils
 import ru.sorokin.dev.yamob2018.util.GlideApp
 import ru.sorokin.dev.yamob2018.util.observe
@@ -31,14 +32,14 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         setHasOptionsMenu(true)
 
         viewModel.account.observe(this) {res ->
-            res?.firstOrNull()?.let {
+            res?.singleOrNull{ it.token == AccountRepo.token }?.let {
                 tv_username.text = it.login
                 if (!it.isAvatarEmpty) {
                     GlideApp
                             .with(this)
                             .load("https://avatars.yandex.net/get-yapic/${it.avatarId}/islands-200")
                             .circleCrop()
-                            .placeholder(R.drawable.ic_account_circle) //TODO: Add HQ default account image
+                            .placeholder(R.drawable.ic_account_circle) //TODO: Add HQ default accounts image
                             .into(iv_avatar)
                 }
             }
@@ -71,8 +72,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
 
         if(id == R.id.action_signout){
             //TODO: add confirmation dialog
-            viewModel.signout()
-            (activity as MainActivity).viewModel.updateUI(true)
+            (activity as MainActivity).authViewModel.signout()
             return true
         } else {
             return super.onOptionsItemSelected(item)

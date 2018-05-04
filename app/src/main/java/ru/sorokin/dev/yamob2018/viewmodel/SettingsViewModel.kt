@@ -15,13 +15,9 @@ class SettingsViewModel: BaseFragmentViewModel() {
     var accountRepo = AccountRepo()
     var driveRepo = DriveRepo()
 
-    var account : RealmLiveData<AccountInfo> = RealmLiveData(accountRepo.getAccountInfo(false))
+    var account : RealmLiveData<AccountInfo> = RealmLiveData(accountRepo.getAllAccounts(false))
     var driveInfo : RealmLiveData<DriveInfo> = RealmLiveData(driveRepo.getDiskInfo())
 
-    fun signout(){
-        accountRepo.signOut()
-
-    }
 
 
 

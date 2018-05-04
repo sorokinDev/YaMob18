@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_feed"
+        android:id="@+id/navigation_images"
         android:icon="@drawable/ic_photo_library_24_b"
         android:title="@string/title_all_photos" />
 

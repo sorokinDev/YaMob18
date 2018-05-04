@@ -14,5 +14,6 @@ open class DriveImage(
         @SerializedName("created") var dateCreated: Date = Date(),
         @SerializedName("modified") var dateModified: Date = Date(),
         @SerializedName("file") var file: String = "",
-        @SerializedName("preview") var preview: String = ""
+        @SerializedName("preview") var preview: String = "",
+        var token: String = ""
 ) : RealmModel

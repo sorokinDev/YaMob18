@@ -91,3 +91,4 @@ class BottomNavigationViewBehavior : CoordinatorLayout.Behavior<BottomNavigation
         child.animate().translationY(height.toFloat()).duration = 200
     }
 }
+

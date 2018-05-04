@@ -1,5 +1,6 @@
 package ru.sorokin.dev.yamob2018.model.repository
 
+import android.util.Log
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 import io.realm.Realm
@@ -9,7 +10,6 @@ import retrofit2.Response
 import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.Pref
 import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
-import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
 import ru.sorokin.dev.yamob2018.model.rest.Providers
 
@@ -17,16 +17,56 @@ import ru.sorokin.dev.yamob2018.model.rest.Providers
 class AccountRepo {
     companion object {
         var token: String? = null
-            get() = DriveApp.preferences.getString(Pref.TOKEN, null)
+            get() = DriveApp.preferences.getString(Pref.TOKEN, "")
 
         val SCOPES = setOf("cloud_api:disk.read", "cloud_api:disk.app_folder", "cloud_api:disk.info", "cloud_api:disk.write", "login:avatar")
     }
 
-
     var authSdk: YandexAuthSdk = YandexAuthSdk(DriveApp.INSTANCE.applicationContext, YandexAuthOptions(DriveApp.INSTANCE.applicationContext, true))
     var realm : Realm = Realm.getDefaultInstance()
 
-    fun getAccountInfo(refreshAnyway: Boolean = false): RealmResults<AccountInfo>{
+    fun saveAuth(token: String){
+        DriveApp.preferences.edit().putString(Pref.TOKEN, token).apply()
+        realm.executeTransaction {
+            realm.insertOrUpdate(AccountInfo(token = token))
+        }
+        getAllAccounts(true)
+
+    }
+
+    fun getAllAccounts(refreshAnyway: Boolean = false): RealmResults<AccountInfo>{
+        val accRes = realm.where(AccountInfo::class.java).findAll()
+
+        var currentAcc = accRes.singleOrNull { it.token == AccountRepo.token }
+        if(currentAcc != null && currentAcc.id != "" && !refreshAnyway){
+            return realm.where(AccountInfo::class.java).findAllAsync()
+        }
+
+        val accountApi = Providers.provideAccountApi()
+
+        accountApi.getAccountInfo().enqueue(object : BaseCallback<AccountInfo>() {
+            override val toastOnFailure: String? = null
+            override val snackOnFailure: String? = "No internet"
+
+            override fun onSucceessResponse(call: Call<AccountInfo>, response: Response<AccountInfo>) {
+                response.body()?.let { acc ->
+                    Log.i("accRepo", "get acc OnSuccess response")
+                    acc.token = AccountRepo.token!!
+                    realm.executeTransaction {realm ->
+                        realm.insertOrUpdate(acc)
+                    }
+                }
+            }
+
+            override fun onBadResponse(call: Call<AccountInfo>, response: Response<AccountInfo>) {
+
+            }
+        })
+
+        return realm.where(AccountInfo::class.java).findAllAsync()
+    }
+
+    /*fun getAccountInfo(refreshAnyway: Boolean = false): RealmResults<AccountInfo>{
         val accRes = realm.where(AccountInfo::class.java).equalTo("token", AccountRepo.token).findAllAsync()
 
         val currentAcc = accRes.firstOrNull()
@@ -55,13 +95,16 @@ class AccountRepo {
         })
 
         return accRes
-    }
+    }*/
 
     fun signOut(){
-        realm.executeTransaction {
-            it.where(AccountInfo::class.java).equalTo("token", AccountRepo.token).findAll().deleteAllFromRealm()
-            it.where(DriveInfo::class.java).equalTo("token", AccountRepo.token).findAll().deleteAllFromRealm()
-        }
         DriveApp.preferences.edit().remove(Pref.TOKEN).apply()
+        deleteUserData() //TODO: make good signing out
+    }
+
+    fun deleteUserData(){
+        realm.executeTransaction {
+            it.deleteAll()
+        }
     }
 }

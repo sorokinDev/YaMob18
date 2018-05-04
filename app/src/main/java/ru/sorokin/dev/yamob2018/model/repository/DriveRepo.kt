@@ -51,6 +51,9 @@ class DriveRepo {
             override fun onSucceessResponse(call: Call<DriveGetImagesResult>, response: Response<DriveGetImagesResult>) {
                 response.body()?.let {
                     Log.i("DriveRepo", "Loaded: ${it.items.size} images")
+                    it.items.forEach {im ->
+                        im.token = AccountRepo.token!!
+                    }
                     realm.executeTransaction { rm ->
                         rm.insertOrUpdate(it.items)
                     }

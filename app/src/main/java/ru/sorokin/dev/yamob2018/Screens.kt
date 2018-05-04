@@ -5,6 +5,6 @@ object Screens {
     const val OFFLINE = "offline"
     const val SETTINGS = "settings"
     const val AUTH = "auth"
-    const val AUTH_FAILURE = "auth_failure"
+    const val AUTH_NEEDED = "auth_needed"
     const val HOME = "home"
 }
