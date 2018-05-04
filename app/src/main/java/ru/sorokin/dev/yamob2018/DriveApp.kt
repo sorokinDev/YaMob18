@@ -13,9 +13,9 @@ class DriveApp : Application() {
     }
 
     companion object {
-        val SHARED_PREF_NAME = "DriveApp"
+        const val SHARED_PREF_NAME = "DriveApp"
 
-        val YA_ID = "85820f69416b4c99a807bd5184ce45f3"
+        const val YA_ID = "85820f69416b4c99a807bd5184ce45f3"
 
         lateinit var INSTANCE: DriveApp
 

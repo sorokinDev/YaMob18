@@ -3,10 +3,8 @@ package ru.sorokin.dev.yamob2018.view
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_auth_failure.*
-
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.Screens
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM

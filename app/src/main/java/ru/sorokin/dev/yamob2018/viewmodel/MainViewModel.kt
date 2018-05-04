@@ -28,8 +28,6 @@ class MainViewModel: BaseViewModel() {
         }
     }
 
-
-
     fun navTo(screenName : String) {
         currentScreen.value = screenName
     }

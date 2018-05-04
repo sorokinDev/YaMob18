@@ -1,6 +1,5 @@
 package ru.sorokin.dev.yamob2018.model.rest
 
-import android.support.design.widget.Snackbar
 import android.widget.Toast
 import retrofit2.Call
 import retrofit2.Callback

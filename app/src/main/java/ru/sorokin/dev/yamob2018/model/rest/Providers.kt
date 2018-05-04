@@ -7,23 +7,22 @@ import retrofit2.converter.gson.GsonConverterFactory
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 
 
-
 class Providers {
     companion object {
-        fun provideAccountApi() = Retrofit.Builder()
+        fun provideAccountApi() : AccountApi = Retrofit.Builder()
             .baseUrl(AccountApi.BASE_URL)
             .client(provideClient())
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(AccountApi::class.java)
 
-        fun provideDriveApi() = Retrofit.Builder()
+        fun provideDriveApi() : DriveApi = Retrofit.Builder()
                 .baseUrl(DriveApi.BASE_URL)
                 .client(provideClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(DriveApi::class.java)
 
         private fun provideClient(): OkHttpClient {
-            val client = OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
+            return OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
                 val original = chain.request()
 
                 //TODO: add timeouts
@@ -36,7 +35,6 @@ class Providers {
 
                 return@Interceptor chain.proceed(request)
             }).build()
-            return client
         }
     }
 }

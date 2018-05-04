@@ -24,7 +24,6 @@ class ImageGalleryViewModel: BaseFragmentViewModel() {
 
     var imagesAsList: List<DriveImage> = listOf()
         get() = if(images.value != null) images.value!!.filterNot { it.preview == "" || it.file == "" } else listOf()
-    val rvPosition = mutableLiveDataWithValue(0)
 
     fun loadImages(limit: Int, offset: Int, preview_crop: Boolean,
                   preview_size: String, sort: String){

@@ -1,9 +1,7 @@
 package ru.sorokin.dev.yamob2018.view.base
 
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
 import android.view.View
-import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.MainActivity
 import ru.sorokin.dev.yamob2018.viewmodel.base.BaseFragmentViewModel

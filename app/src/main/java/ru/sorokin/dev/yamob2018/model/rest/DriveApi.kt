@@ -2,10 +2,8 @@ package ru.sorokin.dev.yamob2018.model.rest
 
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.sorokin.dev.yamob2018.model.entity.DriveGetImagesResult
-import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 
 interface DriveApi {

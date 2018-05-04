@@ -1,23 +1,14 @@
 package ru.sorokin.dev.yamob2018.model.repository
 
-import android.util.Log
-import com.google.gson.GsonBuilder
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 import io.realm.Realm
 import io.realm.RealmResults
-import io.realm.kotlin.isValid
-import io.realm.kotlin.load
-import okhttp3.OkHttpClient
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.Pref
 import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
-import ru.sorokin.dev.yamob2018.model.rest.AccountApi
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
 import ru.sorokin.dev.yamob2018.model.rest.Providers
@@ -33,7 +24,7 @@ class AccountRepo {
 
 
     var authSdk: YandexAuthSdk = YandexAuthSdk(DriveApp.INSTANCE.applicationContext, YandexAuthOptions(DriveApp.INSTANCE.applicationContext, true))
-    var realm = Realm.getDefaultInstance()
+    var realm : Realm = Realm.getDefaultInstance()
 
     fun getAccountInfo(refreshAnyway: Boolean = false): RealmResults<AccountInfo>{
         val accRes = realm.where(AccountInfo::class.java).equalTo("token", AccountRepo.token).findAllAsync()
@@ -43,7 +34,7 @@ class AccountRepo {
             return accRes
         }
 
-        var accountApi = Providers.provideAccountApi()
+        val accountApi = Providers.provideAccountApi()
 
         accountApi.getAccountInfo().enqueue(object : BaseCallback<AccountInfo>() {
             override val toastOnFailure: String? = null

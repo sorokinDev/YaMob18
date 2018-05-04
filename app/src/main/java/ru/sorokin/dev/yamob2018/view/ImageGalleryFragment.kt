@@ -5,33 +5,44 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-
-import android.view.View
-import kotlinx.android.synthetic.main.fragment_image_gallery.*
-
-import ru.sorokin.dev.yamob2018.R
-import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
-import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
+import kotlinx.android.synthetic.main.fragment_image_gallery.*
 import ru.sorokin.dev.yamob2018.DriveApp
+import ru.sorokin.dev.yamob2018.R
+import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 import ru.sorokin.dev.yamob2018.util.GlideApp
 import ru.sorokin.dev.yamob2018.util.observe
+import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
+import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
 
 
 class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
+
+    var rvPos: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if(savedInstanceState != null){
+            rvPos = savedInstanceState.getInt("RVPOS")
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("RVPOS", rvLayoutManager.findFirstVisibleItemPosition())
+        if(::rvLayoutManager.isInitialized){
+            outState.putInt("RVPOS", rvLayoutManager.findFirstVisibleItemPosition())
+        }else{
+            outState.putInt("RVPOS", rvPos)
+        }
 
     }
 
@@ -54,7 +65,7 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
 
         rv_images.setHasFixedSize(true)
-        rvLayoutManager = GridLayoutManager(context, Math.max(3, rv_images.width    / 100))
+        rvLayoutManager = GridLayoutManager(context, Math.max(3, rv_images.width / 100))
         rvLayoutManager.orientation = LinearLayout.VERTICAL
         rv_images.layoutManager = rvLayoutManager
 
@@ -89,7 +100,7 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
     private inner class ImageGalleryAdapter(
             private val mContext: Context,
-            public var images: List<DriveImage>)
+            var images: List<DriveImage>)
         : RecyclerView.Adapter<ImageGalleryAdapter.MyViewHolder>(){
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageGalleryAdapter.MyViewHolder {

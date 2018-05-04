@@ -2,35 +2,31 @@ package ru.sorokin.dev.yamob2018.view
 
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.Nullable
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.CoordinatorLayout
+import android.support.v4.app.Fragment
 import android.util.Log
-import ru.sorokin.dev.yamob2018.DriveApp
+import com.ncapdevi.fragnav.FragNavController
+import com.yandex.authsdk.YandexAuthException
+import kotlinx.android.synthetic.main.activity_main.*
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.Screens
+import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
+import ru.sorokin.dev.yamob2018.util.BottomNavigationViewBehavior
+import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.base.BaseActivityWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.MainViewModel
-import com.yandex.authsdk.YandexAuthException
-import android.content.Intent
-import android.support.annotation.Nullable
-import android.support.v4.view.ViewPager
-import kotlinx.android.synthetic.main.activity_main.*
-import android.os.Parcelable
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.view.PagerAdapter
-import android.view.View
-import android.view.ViewGroup
-import android.support.v4.app.FragmentPagerAdapter
-import com.ncapdevi.fragnav.FragNavController
-import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
-import ru.sorokin.dev.yamob2018.util.observe
+
+
 
 
 class MainActivity : BaseActivityWithVM<MainViewModel>() {
 
     companion object {
-        val REQUEST_CODE_YA_LOGIN = 1001
+        const val REQUEST_CODE_YA_LOGIN = 1001
         val TAB_MAPPING = mapOf(Pair(R.id.navigation_feed, Screens.IMAGES), Pair(R.id.navigation_offline, Screens.OFFLINE),
                 Pair(R.id.navigation_settings, Screens.SETTINGS))
     }
@@ -77,7 +73,7 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         fragNavController = FragNavController
-                .newBuilder(savedInstanceState, getSupportFragmentManager(), containerId)
+                .newBuilder(savedInstanceState, supportFragmentManager, containerId)
                 .rootFragments(listOf(
                         ImageGalleryFragment.newInstance(),
                         Fragment(),
@@ -113,7 +109,10 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
             }
         }
 
-        if (getIntent() != null && getIntent().getData() != null) {
+        val layoutParams = navigation.getLayoutParams() as CoordinatorLayout.LayoutParams
+        layoutParams.behavior = BottomNavigationViewBehavior()
+
+        if (intent != null && intent.data != null) {
             return
         }
 
@@ -121,10 +120,14 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
     }
 
     fun setSelectedNavItem(itemN: Int){
+        Log.i("SelNav", itemN.toString())
         val menu = navigation.menu
-        for (i in 1..menu.size()-1){
+        menu.getItem(itemN).isChecked = true
+        for (i in 0..menu.size()-1){
             val item = menu.getItem(i)
-            item.setChecked(i == itemN)
+            Log.i("SelNav", item.title.toString())
+            item.isChecked = i == itemN
+            break
         }
     }
 

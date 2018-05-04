@@ -2,23 +2,20 @@ package ru.sorokin.dev.yamob2018.view
 
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_settings.*
-
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.util.ConvertUtils
 import ru.sorokin.dev.yamob2018.util.GlideApp
 import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.SettingsViewModel
-import android.content.Intent
-import android.net.Uri
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import io.realm.kotlin.isLoaded
-import io.realm.kotlin.isValid
 
 
 class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
@@ -70,7 +67,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
+        val id = item.itemId
 
         if(id == R.id.action_signout){
             //TODO: add confirmation dialog

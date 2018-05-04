@@ -5,17 +5,17 @@ import io.realm.Realm
 import io.realm.RealmResults
 import retrofit2.Call
 import retrofit2.Response
-import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
 import ru.sorokin.dev.yamob2018.model.entity.DriveGetImagesResult
 import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
+import ru.sorokin.dev.yamob2018.model.rest.DriveApi
 import ru.sorokin.dev.yamob2018.model.rest.Providers
 
 
 class DriveRepo {
 
-    var realm = Realm.getDefaultInstance()
-    var driveApi = Providers.provideDriveApi()
+    var realm :Realm = Realm.getDefaultInstance()
+    var driveApi : DriveApi = Providers.provideDriveApi()
 
     fun getDiskInfo() : RealmResults<DriveInfo> {
         driveApi.getDriveInfo().enqueue(object : BaseCallback<DriveInfo>() {
