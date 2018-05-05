@@ -6,6 +6,7 @@ import io.realm.RealmResults
 import retrofit2.Call
 import retrofit2.Response
 import ru.sorokin.dev.yamob2018.model.entity.DriveGetImagesResult
+import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
 import ru.sorokin.dev.yamob2018.model.rest.DriveApi
@@ -16,6 +17,7 @@ class DriveRepo {
 
     var realm :Realm = Realm.getDefaultInstance()
     var driveApi : DriveApi = Providers.provideDriveApi()
+    var isFirstLoad: Boolean = true
 
     fun getDiskInfo() : RealmResults<DriveInfo> {
         driveApi.getDriveInfo().enqueue(object : BaseCallback<DriveInfo>() {
@@ -41,7 +43,7 @@ class DriveRepo {
     }
 
     fun getImages(limit: Int, offset: Int, preview_crop: Boolean,
-                   preview_size: String, sort: String){
+                   preview_size: String, sort: String, onAfterResponse: () -> Unit){
         val fields = "items.resource_id,items.name,items.created,items.modified," +
                 "items.file,items.preview,limit,offset"
         driveApi.getImages(fields, limit, offset, preview_crop, preview_size, sort).enqueue(object : BaseCallback<DriveGetImagesResult>() {
@@ -50,6 +52,10 @@ class DriveRepo {
 
             override fun onSucceessResponse(call: Call<DriveGetImagesResult>, response: Response<DriveGetImagesResult>) {
                 response.body()?.let {
+                    if(isFirstLoad){
+                        isFirstLoad = false
+                        realm.executeTransaction { rm -> rm.delete(DriveImage::class.java) }
+                    }
                     Log.i("DriveRepo", "Loaded: ${it.items.size} images")
                     it.items.forEach {im ->
                         im.token = AccountRepo.token!!
@@ -58,10 +64,12 @@ class DriveRepo {
                         rm.insertOrUpdate(it.items)
                     }
                 }
+                onAfterResponse()
             }
 
             override fun onBadResponse(call: Call<DriveGetImagesResult>, response: Response<DriveGetImagesResult>) {
                 Log.i("DriveRepo", "Bad response")
+                onAfterResponse()
             }
         })
 

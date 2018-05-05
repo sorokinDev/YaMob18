@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import kotlinx.android.synthetic.main.fragment_image_gallery.*
@@ -19,6 +18,7 @@ import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
+import ru.sorokin.dev.yamob2018.util.EndlessRecyclerViewScrollListener
 import ru.sorokin.dev.yamob2018.util.GlideApp
 import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
@@ -65,17 +65,24 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
 
         rv_images.setHasFixedSize(true)
-        rvLayoutManager = GridLayoutManager(context, Math.max(3, rv_images.width / 100))
-        rvLayoutManager.orientation = LinearLayout.VERTICAL
+        rvLayoutManager = GridLayoutManager(context, 3)
         rv_images.layoutManager = rvLayoutManager
 
         val adapter = ImageGalleryAdapter(DriveApp.INSTANCE.applicationContext, viewModel.imagesAsList)
         rv_images.adapter = adapter
+        rv_images.addOnScrollListener(object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
+            override fun loadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                //Log.i("onLoad", "${page} ${totalItemsCount}")
+                viewModel.loadImages(100, totalItemsCount, true, "S", "-modified", { afterLoadMore() })
+
+            }
+        })
 
         viewModel.images.observe(this) {
             it?.let {
                 if (it.isValid) {
                     Log.i("Gallery", "In observe")
+
                     adapter.images = viewModel.imagesAsList
                     adapter.notifyDataSetChanged()
                 }
@@ -84,16 +91,13 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
 
         if(savedInstanceState == null){
-            viewModel.loadImages(20, 0, true, "S", "-modified")
+            viewModel.loadFirst(60, 0, true, "S", "-modified", {  })
         }
 
         if(savedInstanceState != null){
-            rvLayoutManager.scrollToPosition(savedInstanceState.getInt("RVPOS"))
+            //rvLayoutManager.scrollToPosition(savedInstanceState.getInt("RVPOS"))
             Log.i("RVPOS", savedInstanceState.getInt("RVPOS").toString())
-
         }
-
-
 
     }
 

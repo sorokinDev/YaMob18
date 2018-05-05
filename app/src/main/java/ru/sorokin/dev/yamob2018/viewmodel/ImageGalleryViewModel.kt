@@ -18,16 +18,26 @@ class ImageGalleryViewModel: BaseFragmentViewModel() {
 
     override var bottomBarVisibility: MutableLiveData<Int> = mutableLiveDataWithValue(View.VISIBLE)
 
+
+
+
     val driveRepo = DriveRepo()
 
     var images: RealmLiveData<DriveImage> = RealmLiveData(driveRepo.realm.where(DriveImage::class.java).sort("dateModified", Sort.DESCENDING).findAllAsync())
 
     var imagesAsList: List<DriveImage> = listOf()
-        get() = if(images.value != null) images.value!!.filterNot { it.preview == "" || it.file == "" } else listOf()
+        get() = if(images.value != null && images.value!!.isValid) images.value!! else listOf()
 
     fun loadImages(limit: Int, offset: Int, preview_crop: Boolean,
-                  preview_size: String, sort: String){
-        driveRepo.getImages(limit, offset, preview_crop, preview_size, sort)
+                  preview_size: String, sort: String, onAfterResponse: () -> Unit){
+        driveRepo.getImages(limit, offset, preview_crop, preview_size, sort, onAfterResponse)
 
+
+    }
+
+    fun loadFirst(limit: Int, offset: Int, preview_crop: Boolean,
+                  preview_size: String, sort: String, onAfterResponse: () -> Unit) {
+        driveRepo.isFirstLoad = true
+        loadImages(limit, offset, preview_crop, preview_size, sort, onAfterResponse)
     }
 }

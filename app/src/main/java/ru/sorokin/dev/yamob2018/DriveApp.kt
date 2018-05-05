@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.multidex.MultiDex
 import io.realm.Realm
+import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
+import ru.sorokin.dev.yamob2018.model.repository.DriveRepo
 
 class DriveApp : Application() {
     override fun attachBaseContext(base: Context?) {
@@ -21,7 +23,12 @@ class DriveApp : Application() {
 
         val preferences: SharedPreferences
             get() = INSTANCE.getSharedPreferences(DriveApp.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+
+
     }
+
+    lateinit var accountRepo: AccountRepo
+    lateinit var driveRepo: DriveRepo
 
     override fun onCreate() {
         super.onCreate()
@@ -29,6 +36,9 @@ class DriveApp : Application() {
         INSTANCE = this
 
         Realm.init(applicationContext)
+
+        INSTANCE.accountRepo = AccountRepo()
+        INSTANCE.driveRepo = DriveRepo()
     }
 
 }
