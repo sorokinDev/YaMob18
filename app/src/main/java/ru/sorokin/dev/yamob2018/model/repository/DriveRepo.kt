@@ -20,6 +20,7 @@ class DriveRepo {
     var isFirstLoad: Boolean = true
 
     fun getDiskInfo() : RealmResults<DriveInfo> {
+
         driveApi.getDriveInfo().enqueue(object : BaseCallback<DriveInfo>() {
             override val toastOnFailure: String? = null
             override val snackOnFailure: String? = null
@@ -43,12 +44,16 @@ class DriveRepo {
     }
 
     fun getImages(limit: Int, offset: Int, preview_crop: Boolean,
-                   preview_size: String, sort: String, onAfterResponse: () -> Unit){
+                   preview_size: String, sort: String, onAfterResponse: (extraOffset: Int) -> Unit, onNoConnection: () -> Unit){
+
         val fields = "items.resource_id,items.name,items.created,items.modified," +
                 "items.file,items.preview,limit,offset"
+
         driveApi.getImages(fields, limit, offset, preview_crop, preview_size, sort).enqueue(object : BaseCallback<DriveGetImagesResult>() {
+
             override val toastOnFailure: String? = "No internet"
             override val snackOnFailure: String? = null
+            var extraOffset = 0
 
             override fun onSucceessResponse(call: Call<DriveGetImagesResult>, response: Response<DriveGetImagesResult>) {
                 response.body()?.let {
@@ -57,19 +62,20 @@ class DriveRepo {
                         realm.executeTransaction { rm -> rm.delete(DriveImage::class.java) }
                     }
                     Log.i("DriveRepo", "Loaded: ${it.items.size} images")
-                    it.items.forEach {im ->
-                        im.token = AccountRepo.token!!
+
+                    if(it.items.isNotEmpty()) {
+                        extraOffset = realm.where(DriveImage::class.java).lessThanOrEqualTo("dateModified", it.items.first().dateModified).count().toInt()
                     }
                     realm.executeTransaction { rm ->
                         rm.insertOrUpdate(it.items)
                     }
+
                 }
-                onAfterResponse()
+                onAfterResponse(extraOffset)
             }
 
             override fun onBadResponse(call: Call<DriveGetImagesResult>, response: Response<DriveGetImagesResult>) {
-                Log.i("DriveRepo", "Bad response")
-                onAfterResponse()
+                onNoConnection()
             }
         })
 

@@ -16,7 +16,7 @@ class AuthViewModel: BaseViewModel() {
     }
     val accountRepo = AccountRepo()
     val authState = mutableLiveDataWithValue("")
-    var accounts = RealmLiveData(accountRepo.getAllAccounts(false))
+    var accounts = RealmLiveData(accountRepo.getAccount(false))
 
     init {
         if(AccountRepo.token == null || AccountRepo.token == ""){
@@ -36,6 +36,7 @@ class AuthViewModel: BaseViewModel() {
 
     fun signout(){
         accountRepo.signOut()
+        authState.value = NO_AUTH
     }
 
     fun onAuth(resultCode: Int, @Nullable data: Intent) {

@@ -18,15 +18,14 @@ import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
-import ru.sorokin.dev.yamob2018.util.EndlessRecyclerViewScrollListener
-import ru.sorokin.dev.yamob2018.util.GlideApp
-import ru.sorokin.dev.yamob2018.util.observe
+import ru.sorokin.dev.yamob2018.util.*
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
 
 
 class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
+    override var bottomBarVisibility = mutableLiveDataWithValue(View.VISIBLE)
     var rvPos: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,18 +50,18 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         fun newInstance() = ImageGalleryFragment()
     }
 
-    override fun provideViewModel(): ImageGalleryViewModel = ViewModelProviders.of(this)[ImageGalleryViewModel::class.java]
+    override fun provideViewModel(): ImageGalleryViewModel = ViewModelProviders.of(this.activity!!)[ImageGalleryViewModel::class.java]
 
     override val fragmentLayoutResource: Int = R.layout.fragment_image_gallery
 
     lateinit var rvLayoutManager: GridLayoutManager
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as MainActivity).setSupportActionBar(toolbar)
-        (activity as MainActivity).setTitle(R.string.title_all_photos)
-
+        activity.asMainActivity()?.setSupportActionBar(toolbar)
+        activity?.setTitle(R.string.title_all_photos)
 
         rv_images.setHasFixedSize(true)
         rvLayoutManager = GridLayoutManager(context, 3)
@@ -70,13 +69,15 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
         val adapter = ImageGalleryAdapter(DriveApp.INSTANCE.applicationContext, viewModel.imagesAsList)
         rv_images.adapter = adapter
-        rv_images.addOnScrollListener(object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
+        val rvScrollListener = object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
             override fun loadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
                 //Log.i("onLoad", "${page} ${totalItemsCount}")
-                viewModel.loadImages(100, totalItemsCount, true, "S", "-modified", { afterLoadMore() })
+                //if(!viewModel.loadedFirstPage){ return }
+                viewModel.loadImages(100, totalItemsCount, true, "S", "-modified", { afterLoadMore() }, {  }) //TODO: implement noConnection callback
 
             }
-        })
+        }
+        rv_images.addOnScrollListener(rvScrollListener)
 
         viewModel.images.observe(this) {
             it?.let {
@@ -89,9 +90,16 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             }
         }
 
+        swipe_refresh_layout.setColorSchemeResources(R.color.colorYandexYellow)
+        swipe_refresh_layout.setOnRefreshListener {
+            rvScrollListener.loading.value = true
+            viewModel.loadFirst(100, 0, true, "S", "-modified", { swipe_refresh_layout.isRefreshing = false; rvScrollListener.loading.value = false }, { swipe_refresh_layout.isRefreshing = false; rvScrollListener.loading.value = true }) //TODO: implement noConnection callback
 
-        if(savedInstanceState == null){
-            viewModel.loadFirst(60, 0, true, "S", "-modified", {  })
+        }
+
+        if(!viewModel.loadedFirstPage){
+            rvScrollListener.loading.value = true
+            viewModel.loadFirst(100, 0, true, "S", "-modified", { rvScrollListener.loading.value = false }, { rvScrollListener.loading.value = false }) //TODO: implement noConnection callback
         }
 
         if(savedInstanceState != null){
@@ -116,7 +124,6 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         }
 
         override fun onBindViewHolder(holder: ImageGalleryAdapter.MyViewHolder, position: Int) {
-
             val image = images[position]
             val imageView = holder.imageView
 
@@ -135,7 +142,6 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         }
 
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-
             var imageView: ImageView = itemView.findViewById(R.id.iv_image)
 
             init {
@@ -143,12 +149,19 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             }
 
             override fun onClick(view: View) {
-
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val img = images[position]
 
+                    viewModel.currentPosition = position
+
                     Log.i("GALLERY", "CLICKED: ${img.resourceId}")
+
+                    val iv = view.findViewById<ImageView>(R.id.iv_image)
+
+                    activity.asMainActivity()!!.fragNavController.pushFragment(
+                            ImageCarouselFragment.newInstance())
+
                     //val intent = Intent(mContext, SpacePhotoActivity::class.java)
                     //intent.putExtra(SpacePhotoActivity.EXTRA_SPACE_PHOTO, img)
                     //startActivity(intent)

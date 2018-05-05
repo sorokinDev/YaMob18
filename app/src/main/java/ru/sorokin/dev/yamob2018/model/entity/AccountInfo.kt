@@ -8,9 +8,9 @@ import io.realm.annotations.Required
 
 @RealmClass
 open class AccountInfo(
-        @SerializedName("login") var login: String = "",
-        @SerializedName("id") var id: String = "",
         @PrimaryKey @Required var token: String = "",
+        @SerializedName("id") var id: String = "",
+        @SerializedName("login") var login: String = "",
         @SerializedName("is_avatar_empty") var isAvatarEmpty: Boolean = true,
         @SerializedName("default_avatar_id") var avatarId: String = ""
 ) : RealmModel

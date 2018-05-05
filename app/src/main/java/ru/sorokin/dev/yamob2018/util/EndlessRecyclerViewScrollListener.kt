@@ -5,10 +5,9 @@ import android.support.v7.widget.RecyclerView
 
 
 abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutManager) : RecyclerView.OnScrollListener() {
-    var visibleThreshold = 40
+    var visibleThreshold = 100
     var previousTotalItemCount = 0
     var loading = mutableLiveDataWithValue(false)
-    val startingOffset = 0
 
 
     fun getLastVisibleItem(lastVisibleItemPositions: IntArray): Int {
@@ -64,6 +63,7 @@ abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutMa
     fun afterLoadMore(){
         loading.value = false
     }
+
 
     abstract fun loadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
 

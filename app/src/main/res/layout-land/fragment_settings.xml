@@ -60,7 +60,7 @@
                 style="@style/Base.TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="23dp"
-                android:text="@string/available_space"
+                android:text="No info"
                 app:layout_constraintStart_toStartOf="@+id/pb_available_space"
                 app:layout_constraintTop_toTopOf="@+id/iv_avatar" />
 

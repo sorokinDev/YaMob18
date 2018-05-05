@@ -12,8 +12,9 @@ import android.view.View
 import kotlinx.android.synthetic.main.fragment_settings.*
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
-import ru.sorokin.dev.yamob2018.util.ConvertUtils
 import ru.sorokin.dev.yamob2018.util.GlideApp
+import ru.sorokin.dev.yamob2018.util.bytesToGbs
+import ru.sorokin.dev.yamob2018.util.mutableLiveDataWithValue
 import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.SettingsViewModel
@@ -23,6 +24,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
     companion object {
         fun newInstance() = SettingsFragment()
     }
+    override var bottomBarVisibility = mutableLiveDataWithValue(View.VISIBLE)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,7 +34,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         setHasOptionsMenu(true)
 
         viewModel.account.observe(this) {res ->
-            res?.singleOrNull{ it.token == AccountRepo.token }?.let {
+            res?.singleOrNull{ it.token == AccountRepo.token && it.id != "" }?.let {
                 tv_username.text = it.login
                 if (!it.isAvatarEmpty) {
                     GlideApp
@@ -48,8 +50,8 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
 
         viewModel.driveInfo.observe(this) { res ->
             res?.firstOrNull()?.let {
-                tv_available_space.text = getString(R.string.available_space, ConvertUtils.bytesToGbs(it.totalSpace - it.usedSpace),
-                        ConvertUtils.bytesToGbs(it.totalSpace))
+                tv_available_space.text = getString(R.string.available_space, bytesToGbs(it.totalSpace - it.usedSpace),
+                        bytesToGbs(it.totalSpace))
 
                 pb_available_space.progress = Math.max((it.usedSpace.toDouble() / it.totalSpace * 100).toInt(), 2)
 
@@ -73,6 +75,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         if(id == R.id.action_signout){
             //TODO: add confirmation dialog
             (activity as MainActivity).authViewModel.signout()
+
             return true
         } else {
             return super.onOptionsItemSelected(item)
