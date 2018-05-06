@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.fragment_image_carousel.*
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.util.apiQueryCallback
 import ru.sorokin.dev.yamob2018.util.mutableLiveDataWithValue
+import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
 
@@ -47,6 +48,9 @@ class ImageCarouselFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         super.onViewCreated(view, savedInstanceState)
         vp_images.adapter = ImagePagerAdapter(this)
         vp_images.currentItem = viewModel.currentPosition.value!!
+
+
+
         vp_images.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
 
@@ -65,6 +69,15 @@ class ImageCarouselFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             }
 
         })
+
+        viewModel.images.observe(this) {
+            it?.let {
+                if (it.isValid) {
+                    vp_images?.adapter?.notifyDataSetChanged()
+
+                }
+            }
+        }
 
         //activity?.let {
         //    it.asMainActivity()!!.setSupportActionBar(toolbar)

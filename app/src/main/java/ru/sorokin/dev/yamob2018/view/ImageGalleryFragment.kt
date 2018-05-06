@@ -76,6 +76,7 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
                 if (it.isValid) {
                     adapter.images = viewModel.imagesAsList
                     adapter.notifyDataSetChanged()
+
                 }
             }
         }
