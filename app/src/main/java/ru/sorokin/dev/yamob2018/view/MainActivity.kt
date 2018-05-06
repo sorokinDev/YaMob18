@@ -107,11 +107,17 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
     //Does all navigation initialisation
     fun initNavigation(savedInstanceState: Bundle?){
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        navigation.setOnNavigationItemReselectedListener {
+            when(it.itemId){
+                R.id.navigation_images -> imageGalleryViewModel.rvPosition.value = 0
+                R.id.navigation_settings -> fragNavController.clearStack()
+            }
+        }
         createFragNavController(savedInstanceState)
 
         viewModel.currentScreen.observe(this){ it?.let { onCurrentScreenChanged(it) } }
 
-        val layoutParams = navigation.getLayoutParams() as CoordinatorLayout.LayoutParams
+        val layoutParams = navigation.layoutParams as CoordinatorLayout.LayoutParams
         layoutParams.behavior = BottomNavigationViewBehavior()
     }
 
@@ -181,7 +187,6 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
                     if(viewModel.needGoHome) viewModel.navTo(Screens.HOME)
                     imageGalleryViewModel.loadFirst(100, 0, true, "S", "-modified",
                         apiQueryCallback { isSuccessResponse, isFailure, response, error ->
-
                         }
                     )
                 }

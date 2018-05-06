@@ -9,6 +9,13 @@ import ru.sorokin.dev.yamob2018.util.*
 import ru.sorokin.dev.yamob2018.viewmodel.base.BaseFragmentViewModel
 
 class ImageGalleryViewModel: BaseFragmentViewModel() {
+
+    companion object {
+        const val FIRST_BATCH_SIZE = 60
+        const val BATCH_SIZE = 50
+        const val VISIBLE_THRESHOLD = 40
+    }
+
     override fun onCleared() {
         super.onCleared()
         Log.i("galleryVM", "onCleared")
@@ -46,13 +53,11 @@ class ImageGalleryViewModel: BaseFragmentViewModel() {
                 resCallback.handle(isSuccessResponse, isFailure, response, error)
             }
         )
-
     }
 
     fun loadFirst(limit: Int, offset: Int, preview_crop: Boolean,
                   preview_size: String, sort: String, resCallback: ApiQueryCallback<DriveGetImagesResult>) {
         extraOffset = 0
-        driveRepo.isFirstLoad = true
         loading.value = true
         driveRepo.getImages(false, limit, offset + extraOffset, preview_crop, preview_size, sort,
                 apiQueryCallback { isSuccessResponse, isFailure, response, error ->
@@ -60,5 +65,13 @@ class ImageGalleryViewModel: BaseFragmentViewModel() {
                     loading.value = false
                     resCallback.handle(isSuccessResponse, isFailure, response, error)
                 })
+    }
+
+    fun loadNewestFirstPage(resCallback: ApiQueryCallback<DriveGetImagesResult>){
+        loadFirst(FIRST_BATCH_SIZE, 0, true, "S", "-modified", resCallback)
+    }
+
+    fun loadNewest(offset: Int, resCallback: ApiQueryCallback<DriveGetImagesResult>){
+        loadFirst(BATCH_SIZE, offset, true, "S", "-modified", resCallback)
     }
 }

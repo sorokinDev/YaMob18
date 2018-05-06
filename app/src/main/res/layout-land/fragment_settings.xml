@@ -11,8 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <android.support.v7.widget.Toolbar
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,35 +30,37 @@
                 android:id="@+id/tv_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:text="@string/no_data"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                app:layout_constraintEnd_toEndOf="@+id/iv_avatar"
-                app:layout_constraintStart_toStartOf="@+id/iv_avatar"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="account.name" />
 
             <ImageView
                 android:id="@+id/iv_avatar"
-                android:layout_width="168dp"
-                android:layout_height="168dp"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/circle_account"
                 android:padding="4dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_username" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_username"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/tv_available_space"
                 style="@style/Base.TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
-                android:layout_height="23dp"
-                android:text="No info"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/no_data"
                 app:layout_constraintStart_toStartOf="@+id/pb_available_space"
                 app:layout_constraintTop_toTopOf="@+id/iv_avatar" />
 
@@ -94,22 +94,21 @@
                 app:layout_constraintStart_toStartOf="@+id/pb_available_space"
                 app:layout_constraintTop_toBottomOf="@+id/pb_available_space" />
 
-            <!-- <Button
-                android:id="@+id/btn_signout"
+            <Button
+                android:id="@+id/btn_go_to_github"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_height="50dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
-                android:text="@string/btn_signout"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                android:textColor="@android:color/holo_red_light"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="8dp"
+                android:text="@string/go_to_github"
+                android:textColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" /> -->
-
+                app:layout_constraintStart_toStartOf="@+id/pb_available_space"
+                app:layout_constraintTop_toBottomOf="@+id/btn_get_extra_space" />
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 

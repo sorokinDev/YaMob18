@@ -5,14 +5,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+    android:background="@android:color/black"
     tools:context=".view.OneImageFragment">
+
 
     <ru.sorokin.dev.yamob2018.util.TouchImageView
         android:id="@+id/img"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/black"
         android:scaleType="fitCenter"/>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_on_failure"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_failure_msg"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/cant_load_image"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/retry"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_failure_msg" />
+    </android.support.constraint.ConstraintLayout>
 
 </FrameLayout>
 

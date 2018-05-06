@@ -31,7 +31,6 @@ class AuthNeededFragment : BaseFragmentWithVM<AuthNeededViewModel>() {
             it?.let {
                 view_no_auth.visibility = if(it == AuthNeededViewModel.STATE_NO_AUTH) View.VISIBLE else View.GONE
                 view_token_only.visibility = if(it == AuthNeededViewModel.STATE_TOKEN_ONLY) View.VISIBLE else View.GONE
-                view_cant_load_info.visibility = if(it == AuthNeededViewModel.STATE_CANT_LOAD_DATA) View.VISIBLE else View.GONE
             }
         }
 
@@ -39,11 +38,13 @@ class AuthNeededFragment : BaseFragmentWithVM<AuthNeededViewModel>() {
             it?.let {
                 when(it){
                     AuthViewModel.NO_AUTH -> viewModel.currentState.value = AuthNeededViewModel.STATE_NO_AUTH
-                    AuthViewModel.TOKEN_ONLY -> viewModel.currentState.value = AuthNeededViewModel.STATE_TOKEN_ONLY
+                    AuthViewModel.TOKEN_ONLY -> { viewModel.currentState.value = AuthNeededViewModel.STATE_TOKEN_ONLY; activity?.asMainActivity()?.authViewModel?.getAccountInfo() }
                     AuthViewModel.COMPLETE_AUTH -> viewModel.currentState.value = AuthNeededViewModel.STATE_NO_AUTH
+                    else -> {}
                 }
             }
         }
+
 
     }
 

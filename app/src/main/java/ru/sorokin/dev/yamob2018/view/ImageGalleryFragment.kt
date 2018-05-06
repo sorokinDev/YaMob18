@@ -7,14 +7,11 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
 import kotlinx.android.synthetic.main.fragment_image_gallery.*
 import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.R
@@ -48,6 +45,7 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         activity.asMainActivity()?.setSupportActionBar(toolbar)
         activity?.setTitle(R.string.title_all_photos)
 
@@ -57,17 +55,16 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
         val adapter = ImageGalleryAdapter(DriveApp.INSTANCE.applicationContext, viewModel.imagesAsList)
         rv_images.adapter = adapter
-        val rvScrollListener = object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
+        val rvScrollListener = object : EndlessRecyclerViewScrollListener(rvLayoutManager, ImageGalleryViewModel.VISIBLE_THRESHOLD) {
             override fun isLoading(): Boolean = viewModel.loading.value!!
 
             override fun loadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                viewModel.loadImages(50, totalItemsCount, true, "S", "-modified",
-                        apiQueryCallback { isSuccessResponse, isFailure, response, error ->
-                            afterLoadMore()
-                            if (response.isValid()){
-                                loadedLastTime = response!!.body()!!.items.count()
-                            }
-                        })
+                viewModel.loadNewest(totalItemsCount, apiQueryCallback { isSuccessResponse, isFailure, response, error ->
+                    afterLoadMore()
+                    if (response.isValid()){
+                        loadedLastTime = response!!.body()!!.items.count()
+                    }
+                })
 
             }
         }
@@ -77,45 +74,35 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         viewModel.images.observe(this) {
             it?.let {
                 if (it.isValid) {
-                    Log.i("Gallery", "In observe")
-
                     adapter.images = viewModel.imagesAsList
                     adapter.notifyDataSetChanged()
                 }
             }
         }
 
-        swipe_refresh_layout.setColorSchemeResources(R.color.colorYandexYellow)
+        swipe_refresh_layout.setColorSchemeResources(R.color.colorAccent)
         swipe_refresh_layout.setOnRefreshListener {
-
-            viewModel.loadFirst(50, 0, true, "S", "-modified",
-                    apiQueryCallback { isSuccessResponse, isFailure, response, error ->
-                        swipe_refresh_layout.isRefreshing = false
-
-                    })
-
+            rvScrollListener.resetState()
+            viewModel.loadNewestFirstPage(apiQueryCallback { isSuccessResponse, isFailure, response, error ->
+                swipe_refresh_layout.isRefreshing = false
+            })
         }
 
         if(!viewModel.loadedFirstPage){
-            viewModel.loadFirst(50, 0, true, "S", "-modified",
-                    apiQueryCallback { isSuccessResponse, isFailure, response, error ->
-
-                    })
+            viewModel.loadNewestFirstPage(apiQueryCallback { isSuccessResponse, isFailure, response, error -> })
         }
 
         viewModel.rvPosition.observe(this){
-            Log.i("rvPos", it!!.toString())
-            if(it != -1){
-                val viewAtPosition = rvLayoutManager.findViewByPosition(it)
-                if (viewAtPosition == null || !rvLayoutManager.isViewPartiallyVisible(viewAtPosition, false, true)) {
-                    rv_images.post({ rvLayoutManager.scrollToPosition(it) })
-                    viewModel.rvPosition.value = -1
-                    Log.i("Gallery", "scrolled")
+            it?.let {
+                if(it != -1){
+                    val viewAtPosition = rvLayoutManager.findViewByPosition(it)
+                    if (viewAtPosition == null || !rvLayoutManager.isViewPartiallyVisible(viewAtPosition, false, true)) {
+                        rv_images.post({ rvLayoutManager.scrollToPosition(it) })
+                        viewModel.rvPosition.value = -1
+                    }
                 }
             }
         }
-
-        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         if(savedInstanceState != null){
             rvLayoutManager.onRestoreInstanceState(savedInstanceState)
@@ -141,11 +128,12 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             val imageView = holder.imageView
 
             GlideApp.with(mContext)
-                    .load(GlideUrl(image.preview, LazyHeaders.Builder().addHeader("Authorization", "OAuth ${AccountRepo.token}").build()))
-                    .placeholder(R.drawable.ic_home_black_24dp) // TODO: find nice placeholder
+                    .load(buildGlideUrl(image.preview, AccountRepo.token))
+                    .placeholder(R.drawable.picture_placeholder_small)
                     .centerCrop()
                     .into(imageView)
         }
+
 
         override fun getItemCount(): Int {
             return images.size
@@ -162,14 +150,8 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     viewModel.currentPosition.value = position
-                    val img = images[position]
 
-                    Log.i("GALLERY", "CLICKED: ${img.resourceId}")
-
-
-                    activity.asMainActivity()!!.fragNavController.pushFragment(
-                            ImageCarouselFragment.newInstance())
-
+                    activity.asMainActivity()!!.fragNavController.pushFragment(ImageCarouselFragment.newInstance())
                 }
             }
         }

@@ -1,10 +1,13 @@
 package ru.sorokin.dev.yamob2018.view
 
 
+import android.app.AlertDialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -34,11 +37,11 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
                 tv_username.text = it.login
                 if (!it.isAvatarEmpty) {
                     GlideApp
-                            .with(this)
-                            .load("https://avatars.yandex.net/get-yapic/${it.avatarId}/islands-200")
-                            .circleCrop()
-                            .placeholder(R.drawable.ic_account_circle) //TODO: Add HQ default accounts image
-                            .into(iv_avatar)
+                        .with(this)
+                        .load(viewModel.getAvatarUrl(it))
+                        .placeholder(RoundedBitmapDrawableFactory.create(resources, BitmapFactory.decodeResource(resources, R.drawable.person_placeholder2)).apply { isCircular = true; setAntiAlias(true) })
+                        .circleCrop()
+                        .into(iv_avatar)
                 }
             }
 
@@ -61,6 +64,10 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         btn_get_extra_space.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_get_extra_space))))
         }
+
+        btn_go_to_github.setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_go_to_github))))
+        }
     }
 
 
@@ -73,8 +80,12 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         val id = item.itemId
 
         if(id == R.id.action_signout){
-            //TODO: add confirmation dialog
-            (activity as MainActivity).authViewModel.signout()
+            val confDialogBuilder = AlertDialog.Builder(activity)
+            confDialogBuilder
+                    .setTitle(R.string.question_want_signout)
+                    .setPositiveButton(R.string.yes, { _, _ -> activity?.asMainActivity()?.authViewModel?.signout() })
+                    .setNegativeButton(R.string.no, { _, _ -> })
+            confDialogBuilder.create().show()
 
             return true
         } else {

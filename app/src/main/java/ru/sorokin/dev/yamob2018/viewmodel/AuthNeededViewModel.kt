@@ -10,6 +10,5 @@ class AuthNeededViewModel: BaseFragmentViewModel() {
         const val STATE_CANT_LOAD_DATA = "cant_load"
     }
 
-
     val currentState = mutableLiveDataWithValue(AuthNeededViewModel.STATE_NO_AUTH)
 }

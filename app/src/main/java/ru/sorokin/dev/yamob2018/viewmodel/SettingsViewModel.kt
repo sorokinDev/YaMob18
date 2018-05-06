@@ -23,4 +23,8 @@ class SettingsViewModel: BaseFragmentViewModel() {
         accountRepo.getAccount(true)
     }
 
+    fun getAvatarUrl(usr: AccountInfo): String {
+        return accountRepo.getUserAvatarUrl(usr)
+    }
+
 }

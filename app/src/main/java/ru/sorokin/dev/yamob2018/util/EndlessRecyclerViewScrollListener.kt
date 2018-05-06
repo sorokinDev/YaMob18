@@ -4,23 +4,9 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 
 
-abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutManager) : RecyclerView.OnScrollListener() {
-    var visibleThreshold = 50
+abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutManager, var visibleThreshold: Int) : RecyclerView.OnScrollListener() {
     var previousTotalItemCount = 0
     var loadedLastTime = 1
-
-    fun getLastVisibleItem(lastVisibleItemPositions: IntArray): Int {
-        var maxSize = 0
-        for (i in lastVisibleItemPositions.indices) {
-            if (i == 0) {
-                maxSize = lastVisibleItemPositions[i]
-            } else if (lastVisibleItemPositions[i] > maxSize) {
-                maxSize = lastVisibleItemPositions[i]
-            }
-        }
-
-        return maxSize
-    }
 
     override fun onScrolled(view: RecyclerView?, dx: Int, dy: Int) {
         var lastVisibleItemPosition = 0
@@ -36,16 +22,12 @@ abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutMa
 
     }
 
-
-    // Call this method whenever performing new searches
-
     fun resetState() {
         this.previousTotalItemCount = 0
-
+        this.loadedLastTime = 1
     }
 
     fun beforeLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?){
-
         previousTotalItemCount = totalItemsCount
 
         loadMore(page, totalItemsCount, view)

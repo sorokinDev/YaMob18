@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">YaMob2018</string>
     <string name="title_all_photos">Фото</string>
-    <string name="title_offline">Офлайн</string>
     <string name="title_settings">Настройки</string>
     <string name="hint_auth_needed">Вам необходимо войти в аккаунт Яндекс, чтобы получить доступ к диску</string>
     <string name="login">Войти</string>
@@ -10,5 +9,13 @@
     <string name="get_extra_space">Получить больше места</string>
     <string name="available_space">Свободно: %1$.2f из %2$.2f ГБ</string>
     <string name="title_auth_failure">Авторизация</string>
-    <string name="cant_load_data">Не удалось получить данные</string>
+    <string name="cant_load_data">Не удалось получить данные. Проверьте соединение.</string>
+    <string name="question_want_signout">Вы действительно хотите выйти из аккаунта?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="no_data">Нет данных</string>
+    <string name="cant_load_image">Не удалось загрузить изображение. Проверьте соединение.</string>
+    <string name="retry">Обновить</string>
+    <string name="go_to_github">Открыть Github репозиторий</string>
+    <string name="loading_user_info">Загружается информация пользователя</string>
 </resources>

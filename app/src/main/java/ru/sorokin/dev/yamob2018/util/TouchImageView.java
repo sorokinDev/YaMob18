@@ -37,7 +37,8 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
-public class TouchImageView extends ImageView {
+
+public class TouchImageView extends android.support.v7.widget.AppCompatImageView {
 
     private static final String DEBUG = "DEBUG";
 
@@ -62,7 +63,8 @@ public class TouchImageView extends ImageView {
     //
     private Matrix matrix, prevMatrix;
 
-    private static enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM };
+    private enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM }
+
     private State state;
 
     private float minScale;
@@ -734,11 +736,8 @@ public class TouchImageView extends ImageView {
         } else if (x >= -1 && direction < 0) {
             return false;
 
-        } else if (Math.abs(x) + viewWidth + 1 >= getImageWidth() && direction > 0) {
-            return false;
-        }
+        } else return !(Math.abs(x) + viewWidth + 1 >= getImageWidth()) || direction <= 0;
 
-        return true;
     }
 
     /**
@@ -804,7 +803,7 @@ public class TouchImageView extends ImageView {
     }
 
     public interface OnTouchImageViewListener {
-        public void onMove();
+        void onMove();
     }
 
     /**
@@ -1132,7 +1131,7 @@ public class TouchImageView extends ImageView {
                 minY = maxY = startY;
             }
 
-            scroller.fling(startX, startY, (int) velocityX, (int) velocityY, minX,
+            scroller.fling(startX, startY, velocityX, velocityY, minX,
                     maxX, minY, maxY);
             currX = startX;
             currY = startY;
@@ -1183,14 +1182,8 @@ public class TouchImageView extends ImageView {
         boolean isPreGingerbread;
 
         public CompatScroller(Context context) {
-            if (VERSION.SDK_INT < VERSION_CODES.GINGERBREAD) {
-                isPreGingerbread = true;
-                scroller = new Scroller(context);
-
-            } else {
-                isPreGingerbread = false;
-                overScroller = new OverScroller(context);
-            }
+            isPreGingerbread = false;
+            overScroller = new OverScroller(context);
         }
 
         public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {

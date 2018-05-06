@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name">YaMob2018</string>
     <string name="title_all_photos">Images</string>
-    <string name="title_offline">Offline</string>
     <string name="title_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hint_auth_needed">You should authenticate to your Yandex account to get access to your drive.</string>
     <string name="login">Log in</string>
     <string name="btn_signout">Sign out</string>
@@ -14,9 +12,15 @@
     <string name="url_get_extra_space" translatable="false">https://disk.yandex.ru/pay</string>
     <string name="title_auth_failure">Authorization</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="cant_load_data">Data can\'t be loaded</string>
+    <string name="cant_load_data">Error, loading data. Check connection.</string>
+    <string name="question_want_signout">Are you sure want to sign out?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="no_data">No data</string>
+    <string name="cant_load_image">Error, loading image. Check connection.</string>
+    <string name="retry">Retry</string>
+    <string name="go_to_github">Open Github repo</string>
+    <string name="url_go_to_github" translatable="false">https://github.com/sorokinDev/YaMob18</string>
+    <string name="loading_user_info">Loading user info</string>
 
 </resources>

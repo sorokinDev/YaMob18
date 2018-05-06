@@ -20,9 +20,7 @@ public class ExtendedViewPager extends ViewPager {
     @Override
     public boolean canScrollHorizontally(int direction) {
         if (getFocusedChild().findViewById(R.id.img) instanceof TouchImageView) {
-
-            return ((TouchImageView) getFocusedChild().findViewById(R.id.img)).canScrollHorizontally(direction);
-
+            return getFocusedChild().findViewById(R.id.img).canScrollHorizontally(direction);
         } else {
             return super.canScrollHorizontally(direction);
         }

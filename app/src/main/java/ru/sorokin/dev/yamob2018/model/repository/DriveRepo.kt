@@ -1,42 +1,36 @@
 package ru.sorokin.dev.yamob2018.model.repository
 
-import android.util.Log
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
 import io.realm.Realm
 import io.realm.RealmResults
+import io.realm.Sort
 import retrofit2.Call
 import retrofit2.Response
+import ru.sorokin.dev.yamob2018.DriveApp
+import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.model.entity.DriveGetImagesResult
 import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
 import ru.sorokin.dev.yamob2018.model.rest.DriveApi
-import ru.sorokin.dev.yamob2018.model.rest.Providers
 import ru.sorokin.dev.yamob2018.util.ApiQueryCallback
+import ru.sorokin.dev.yamob2018.util.Providers
 
 
 class DriveRepo {
-
-    companion object {
-        fun buildGlideUrl(url: String){
-            GlideUrl(url, LazyHeaders.Builder().addHeader("Authorization", "OAuth ${AccountRepo.token}").build())
-        }
-    }
     var realm :Realm = Realm.getDefaultInstance()
     var driveApi : DriveApi = Providers.provideDriveApi()
-    var isFirstLoad: Boolean = true
+
+    fun getLocalDiskInfo(): RealmResults<DriveInfo> {
+        return realm.where(DriveInfo::class.java).equalTo("token", AccountRepo.token).findAllAsync()
+    }
 
     fun getDiskInfo(resCallback: ApiQueryCallback<DriveInfo>) : RealmResults<DriveInfo> {
         driveApi.getDriveInfo().enqueue(object : BaseCallback<DriveInfo>() {
-            override val toastOnFailure: String? = "Не удалось загрузить данные"
+            override val toastOnFailure: String? = DriveApp.INSTANCE.resources.getString(R.string.cant_load_data)
 
             override fun onSucceessResponse(call: Call<DriveInfo>, response: Response<DriveInfo>) {
-                response.body()?.let { di ->
-                    di.token = AccountRepo.token!!
-
-                    realm.executeTransaction {
-                        it.insertOrUpdate(di)
+                response.body()?.let { di -> realm.executeTransaction {
+                        it.insertOrUpdate(di.apply { token = AccountRepo.token })
                     }
                 }
                 resCallback.handle(true, false, response, null)
@@ -52,23 +46,27 @@ class DriveRepo {
             }
         })
 
-        return realm.where(DriveInfo::class.java).equalTo("token", AccountRepo.token).findAllAsync()
+        return getLocalDiskInfo()
     }
 
-    fun getImages(isFirst: Boolean, limit: Int, offset: Int, preview_crop: Boolean, preview_size: String, sort: String,
-                       resCallback: ApiQueryCallback<DriveGetImagesResult>){
+    fun getLocalImages(): RealmResults<DriveImage>? {
+        return realm.where(DriveImage::class.java).sort("dateModified", Sort.DESCENDING).findAllAsync()
+    }
+
+    fun getImages(isFirstLoad: Boolean, limit: Int, offset: Int, preview_crop: Boolean, preview_size: String, sort: String,
+                  resCallback: ApiQueryCallback<DriveGetImagesResult>){
 
         val fields = "items.resource_id,items.name,items.created,items.modified," +
                 "items.file,items.preview,limit,offset"
 
         driveApi.getImages(fields, limit, offset, preview_crop, preview_size, sort).enqueue(object : BaseCallback<DriveGetImagesResult>() {
-            override val toastOnFailure: String? = "Не удалось загрузить данные" //TODO: Change no internet text
+            override val toastOnFailure: String? = DriveApp.INSTANCE.getString(R.string.cant_load_data)
 
             override fun onSucceessResponse(call: Call<DriveGetImagesResult>, response: Response<DriveGetImagesResult>) {
                 response.body()?.let {
-                    Log.i("DriveRepo", "Loaded: ${it.items.size} images")
+                    //Log.i("DriveRepo", "Loaded: ${it.items.size} images")
                     realm.executeTransaction { rm ->
-                        if(isFirst) rm.delete(DriveImage::class.java)
+                        if(isFirstLoad) rm.delete(DriveImage::class.java)
                         rm.insertOrUpdate(it.items)
                     }
                     resCallback.handle(true, false, response, null)

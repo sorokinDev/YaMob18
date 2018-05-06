@@ -2,6 +2,8 @@ package ru.sorokin.dev.yamob2018.util
 
 import android.support.v4.app.FragmentActivity
 import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.module.AppGlideModule
 import retrofit2.Response
 import ru.sorokin.dev.yamob2018.view.MainActivity
@@ -11,7 +13,6 @@ import ru.sorokin.dev.yamob2018.view.MainActivity
 class MyAppGlideModule : AppGlideModule()
 
 const val BYTES_IN_ONE_GB = 1073741824
-
 fun bytesToGbs(bytes: Long): Double {
     return bytes.toDouble() / BYTES_IN_ONE_GB
 }
@@ -35,4 +36,8 @@ fun <T> apiQueryCallback(callback: (isSuccessResponse: Boolean, isFailure: Boole
 
 fun <T> Response<T>?.isValid(): Boolean{
     return this != null && this.isSuccessful && this.body() != null
+}
+
+fun buildGlideUrl(url: String, token: String): GlideUrl{
+    return GlideUrl(url, LazyHeaders.Builder().addHeader("Authorization", "OAuth ${token}").build())
 }

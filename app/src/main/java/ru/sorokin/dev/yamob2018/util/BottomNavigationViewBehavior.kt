@@ -25,8 +25,6 @@ class BottomNavigationViewBehavior : CoordinatorLayout.Behavior<BottomNavigation
                                 target: View, dxConsumed: Int, dyConsumed: Int,
                                 dxUnconsumed: Int, dyUnconsumed: Int,
                                 @ViewCompat.NestedScrollType type: Int) {
-
-        //Log.i("Beh", "onScr")
         if (dyConsumed > 0) {
             slideDown(child)
         } else if (dyConsumed < 0) {
@@ -48,5 +46,6 @@ class BottomNavigationViewBehavior : CoordinatorLayout.Behavior<BottomNavigation
             child.clearAnimation()
             child.animate().translationY(height.toFloat()).duration = 150
         }
+
     }
 }
