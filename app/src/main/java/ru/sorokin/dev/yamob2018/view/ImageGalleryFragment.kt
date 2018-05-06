@@ -23,26 +23,14 @@ import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
 
 
+
+
 class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
-
     override var bottomBarVisibility = mutableLiveDataWithValue(View.VISIBLE)
-    var rvPos: Int = 0
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if(savedInstanceState != null){
-            rvPos = savedInstanceState.getInt("RVPOS")
-        }
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if(::rvLayoutManager.isInitialized){
-            outState.putInt("RVPOS", rvLayoutManager.findFirstVisibleItemPosition())
-        }else{
-            outState.putInt("RVPOS", rvPos)
-        }
-
+        //TODO add saving instance state for RV
     }
 
 
@@ -102,13 +90,19 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             viewModel.loadFirst(100, 0, true, "S", "-modified", { rvScrollListener.loading.value = false }, { rvScrollListener.loading.value = false }) //TODO: implement noConnection callback
         }
 
-        if(savedInstanceState != null){
-            //rvLayoutManager.scrollToPosition(savedInstanceState.getInt("RVPOS"))
-            Log.i("RVPOS", savedInstanceState.getInt("RVPOS").toString())
+        viewModel.rvPosition.observe(this){
+            Log.i("rvPos", it!!.toString())
+            if(it!! != -1){
+                val viewAtPosition = rvLayoutManager.findViewByPosition(it!!)
+                if (viewAtPosition == null || !rvLayoutManager.isViewPartiallyVisible(viewAtPosition, false, true)) {
+                    rv_images.post({ rvLayoutManager.scrollToPosition(it!!) })
+                    viewModel.rvPosition.value = -1
+                    Log.i("Gallery", "scrolled")
+                }
+            }
+
         }
-
     }
-
 
     private inner class ImageGalleryAdapter(
             private val mContext: Context,
@@ -151,9 +145,8 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             override fun onClick(view: View) {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
+                    viewModel.currentPosition.value = position
                     val img = images[position]
-
-                    viewModel.currentPosition = position
 
                     Log.i("GALLERY", "CLICKED: ${img.resourceId}")
 

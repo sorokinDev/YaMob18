@@ -12,10 +12,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.fragment_settings.*
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
-import ru.sorokin.dev.yamob2018.util.GlideApp
-import ru.sorokin.dev.yamob2018.util.bytesToGbs
-import ru.sorokin.dev.yamob2018.util.mutableLiveDataWithValue
-import ru.sorokin.dev.yamob2018.util.observe
+import ru.sorokin.dev.yamob2018.util.*
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.SettingsViewModel
 
@@ -34,7 +31,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         setHasOptionsMenu(true)
 
         viewModel.account.observe(this) {res ->
-            res?.singleOrNull{ it.token == AccountRepo.token && it.id != "" }?.let {
+            res?.singleOrNull{ it.token == AccountRepo.token && !isNullOrEmpty(it.id) }?.let {
                 tv_username.text = it.login
                 if (!it.isAvatarEmpty) {
                     GlideApp

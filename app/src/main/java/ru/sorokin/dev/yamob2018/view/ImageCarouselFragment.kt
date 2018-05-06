@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentStatePagerAdapter
+import android.support.v4.view.ViewPager
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_image_carousel.*
 import ru.sorokin.dev.yamob2018.R
@@ -31,8 +32,22 @@ class ImageCarouselFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         vp_images.adapter = ImagePagerAdapter(this)
-        vp_images.currentItem = viewModel.currentPosition
+        vp_images.currentItem = viewModel.currentPosition.value!!
+        vp_images.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
 
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int) {
+                viewModel.rvPosition.value = position
+                viewModel.currentPosition.value = position
+            }
+
+        })
     }
 
     inner class ImagePagerAdapter(var fragment: ImageCarouselFragment)

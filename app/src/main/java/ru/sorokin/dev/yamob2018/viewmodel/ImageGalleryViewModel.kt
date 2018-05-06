@@ -5,6 +5,7 @@ import io.realm.Sort
 import ru.sorokin.dev.yamob2018.model.entity.DriveImage
 import ru.sorokin.dev.yamob2018.model.repository.DriveRepo
 import ru.sorokin.dev.yamob2018.util.RealmLiveData
+import ru.sorokin.dev.yamob2018.util.mutableLiveDataWithValue
 import ru.sorokin.dev.yamob2018.viewmodel.base.BaseFragmentViewModel
 
 class ImageGalleryViewModel: BaseFragmentViewModel() {
@@ -24,7 +25,10 @@ class ImageGalleryViewModel: BaseFragmentViewModel() {
     var imagesAsList: List<DriveImage> = listOf()
         get() = if(images.value != null && images.value!!.isValid) images.value!! else listOf()
 
-    var currentPosition: Int = 0
+    var currentPosition = mutableLiveDataWithValue(-1)
+    var rvPosition = mutableLiveDataWithValue(-1)
+
+
 
     fun loadImages(limit: Int, offset: Int, preview_crop: Boolean,
                   preview_size: String, sort: String, onAfterResponse: () -> Unit, onNoConnection: () -> Unit){

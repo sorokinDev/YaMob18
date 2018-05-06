@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.annotation.Nullable
 import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 import ru.sorokin.dev.yamob2018.util.RealmLiveData
+import ru.sorokin.dev.yamob2018.util.isNullOrEmpty
 import ru.sorokin.dev.yamob2018.util.mutableLiveDataWithValue
 import ru.sorokin.dev.yamob2018.viewmodel.base.BaseViewModel
 
@@ -19,13 +20,13 @@ class AuthViewModel: BaseViewModel() {
     var accounts = RealmLiveData(accountRepo.getAccount(false))
 
     init {
-        if(AccountRepo.token == null || AccountRepo.token == ""){
+        if(isNullOrEmpty(AccountRepo.token)){
             authState.value = AuthViewModel.NO_AUTH
         }
 
         accounts.observeForever {
             it?.singleOrNull { it.token == AccountRepo.token }?.let {
-                if(it.id == ""){
+                if(isNullOrEmpty(it.id)){
                     authState.value = AuthViewModel.TOKEN_ONLY
                 }else{
                     authState.value = AuthViewModel.COMPLETE_AUTH

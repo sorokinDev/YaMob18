@@ -11,6 +11,7 @@ import ru.sorokin.dev.yamob2018.Pref
 import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
 import ru.sorokin.dev.yamob2018.model.rest.Providers
+import ru.sorokin.dev.yamob2018.util.isNullOrEmpty
 
 
 class AccountRepo {
@@ -40,7 +41,7 @@ class AccountRepo {
         val accRes = realm.where(AccountInfo::class.java).findAll()
 
         val currentAcc = accRes.singleOrNull { it.token == AccountRepo.token }
-        if(currentAcc != null && currentAcc.id != "" && !refreshAnyway){
+        if(currentAcc != null && !isNullOrEmpty(currentAcc.id) && !refreshAnyway){
             return realm.where(AccountInfo::class.java).findAllAsync()
         }
 
