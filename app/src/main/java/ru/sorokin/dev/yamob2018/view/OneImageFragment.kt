@@ -15,9 +15,7 @@ import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
 import ru.sorokin.dev.yamob2018.viewmodel.base.BaseFragmentViewModel
 
-
 class OneImageFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
-
     lateinit var oneImageViewModel: OneImageViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,15 +24,30 @@ class OneImageFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         oneImageViewModel = ViewModelProviders.of(this)[OneImageViewModel::class.java]
 
         if(arguments != null){
-            oneImageViewModel.pos.value = arguments!!.getInt("POS")
+            oneImageViewModel.pos.value = arguments!!.getInt(OneImageFragment.ARG_POS)
         }
 
-        val url = GlideUrl(viewModel.imagesAsList[oneImageViewModel.pos.value!!].file, LazyHeaders.Builder().addHeader("Authorization", "OAuth ${AccountRepo.token}").build())
         GlideApp.with(this.context!!)
-                .load(url) //TODO: refactor
+                .load(GlideUrl(viewModel.imagesAsList[oneImageViewModel.pos.value!!].file,
+                        LazyHeaders.Builder().addHeader("Authorization", "OAuth ${AccountRepo.token}").build()))
                 .placeholder(R.drawable.ic_home_black_24dp) // TODO: find nice placeholder
                 .fitCenter()
                 .into(img)
+
+        img.setOnClickListener {
+            fullScreen()
+        }
+
+    }
+
+    fun fullScreen() {
+        activity?.let {
+            if(it.asMainActivity()!!.supportActionBar!!.isShowing){
+                it.asMainActivity()!!.supportActionBar!!.hide()
+            }else{
+                it.asMainActivity()!!.supportActionBar!!.show()
+            }
+        }
     }
 
     override var bottomBarVisibility = mutableLiveDataWithValue(View.GONE)
@@ -48,7 +61,8 @@ class OneImageFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
 
     companion object {
-        fun newInstance(position: Int) = OneImageFragment().apply { arguments = Bundle().apply { putInt("POS", position) } }
+        const val ARG_POS = "pos"
+        fun newInstance(position: Int) = OneImageFragment().apply { arguments = Bundle().apply { putInt(ARG_POS, position) } }
     }
 
     class OneImageViewModel: BaseFragmentViewModel() {

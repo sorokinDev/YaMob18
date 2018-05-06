@@ -3,6 +3,7 @@ package ru.sorokin.dev.yamob2018.util
 import android.support.v4.app.FragmentActivity
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
+import retrofit2.Response
 import ru.sorokin.dev.yamob2018.view.MainActivity
 
 
@@ -21,4 +22,17 @@ fun isNullOrEmpty(str: String?): Boolean {
 
 fun FragmentActivity?.asMainActivity(): MainActivity?{
     return if (this == null) null else this as MainActivity
+}
+
+fun <T> apiQueryCallback(callback: (isSuccessResponse: Boolean, isFailure: Boolean, response: Response<T>?, error: Throwable?) -> Unit): ApiQueryCallback<T> {
+    return object : ApiQueryCallback<T> {
+        override fun handle(isSuccessResponse: Boolean, isFailure: Boolean, response: Response<T>?, error: Throwable?) {
+            callback(isSuccessResponse, isFailure, response, error)
+        }
+
+    }
+}
+
+fun <T> Response<T>?.isValid(): Boolean{
+    return this != null && this.isSuccessful && this.body() != null
 }

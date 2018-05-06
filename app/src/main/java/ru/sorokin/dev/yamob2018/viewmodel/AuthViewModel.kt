@@ -25,12 +25,15 @@ class AuthViewModel: BaseViewModel() {
         }
 
         accounts.observeForever {
-            it?.singleOrNull { it.token == AccountRepo.token }?.let {
-                if(isNullOrEmpty(it.id)){
+            val fst = it?.singleOrNull { it.token == AccountRepo.token }
+            if(fst != null){
+                if(isNullOrEmpty(fst.id)){
                     authState.value = AuthViewModel.TOKEN_ONLY
                 }else{
                     authState.value = AuthViewModel.COMPLETE_AUTH
                 }
+            }else{
+                authState.value = AuthViewModel.NO_AUTH
             }
         }
     }
@@ -45,9 +48,8 @@ class AuthViewModel: BaseViewModel() {
 
         if (yandexAuthToken != null) {
             accountRepo.saveAuth(yandexAuthToken.value)
-
         }else{
-
+            authState.value = AuthViewModel.NO_AUTH
         }
     }
 

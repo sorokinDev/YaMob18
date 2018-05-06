@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fl_vp_holder"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.ImageCarouselFragment">
-    <android.support.v4.view.ViewPager
+
+    <ru.sorokin.dev.yamob2018.util.ExtendedViewPager
         android:id="@+id/vp_images"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/semiTransparent"
+        android:theme="@style/AppTheme"
+        android:paddingRight="8dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_trigger_offline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_offline_en_24_w" />
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
 </FrameLayout>

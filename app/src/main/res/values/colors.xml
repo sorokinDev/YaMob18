@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#225dab</color> <!-- #1a4780 darker variant -->
     <color name="colorAccent">#FF4081</color>
     <color name="colorYandexYellow">#ffcc00</color>
+    <color name="semiTransparent">#664981d7</color>
 </resources>

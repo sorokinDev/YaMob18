@@ -3,6 +3,7 @@ package ru.sorokin.dev.yamob2018.view
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -10,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
@@ -26,24 +28,22 @@ import ru.sorokin.dev.yamob2018.viewmodel.ImageGalleryViewModel
 
 
 class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
-    override var bottomBarVisibility = mutableLiveDataWithValue(View.VISIBLE)
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        //TODO add saving instance state for RV
+        if(::rvLayoutManager.isInitialized){
+            rvLayoutManager.onSaveInstanceState()
+        }
     }
 
+    override var bottomBarVisibility = mutableLiveDataWithValue(View.VISIBLE)
 
     companion object {
         fun newInstance() = ImageGalleryFragment()
     }
 
     override fun provideViewModel(): ImageGalleryViewModel = ViewModelProviders.of(this.activity!!)[ImageGalleryViewModel::class.java]
-
     override val fragmentLayoutResource: Int = R.layout.fragment_image_gallery
-
     lateinit var rvLayoutManager: GridLayoutManager
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,19 +52,26 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
         activity?.setTitle(R.string.title_all_photos)
 
         rv_images.setHasFixedSize(true)
-        rvLayoutManager = GridLayoutManager(context, 3)
+        rvLayoutManager = GridLayoutManager(context, if(activity!!.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 3 else 5)
         rv_images.layoutManager = rvLayoutManager
 
         val adapter = ImageGalleryAdapter(DriveApp.INSTANCE.applicationContext, viewModel.imagesAsList)
         rv_images.adapter = adapter
         val rvScrollListener = object : EndlessRecyclerViewScrollListener(rvLayoutManager) {
+            override fun isLoading(): Boolean = viewModel.loading.value!!
+
             override fun loadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                //Log.i("onLoad", "${page} ${totalItemsCount}")
-                //if(!viewModel.loadedFirstPage){ return }
-                viewModel.loadImages(100, totalItemsCount, true, "S", "-modified", { afterLoadMore() }, {  }) //TODO: implement noConnection callback
+                viewModel.loadImages(50, totalItemsCount, true, "S", "-modified",
+                        apiQueryCallback { isSuccessResponse, isFailure, response, error ->
+                            afterLoadMore()
+                            if (response.isValid()){
+                                loadedLastTime = response!!.body()!!.items.count()
+                            }
+                        })
 
             }
         }
+
         rv_images.addOnScrollListener(rvScrollListener)
 
         viewModel.images.observe(this) {
@@ -80,28 +87,40 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
         swipe_refresh_layout.setColorSchemeResources(R.color.colorYandexYellow)
         swipe_refresh_layout.setOnRefreshListener {
-            rvScrollListener.loading.value = true
-            viewModel.loadFirst(100, 0, true, "S", "-modified", { swipe_refresh_layout.isRefreshing = false; rvScrollListener.loading.value = false }, { swipe_refresh_layout.isRefreshing = false; rvScrollListener.loading.value = true }) //TODO: implement noConnection callback
+
+            viewModel.loadFirst(50, 0, true, "S", "-modified",
+                    apiQueryCallback { isSuccessResponse, isFailure, response, error ->
+                        swipe_refresh_layout.isRefreshing = false
+
+                    })
 
         }
 
         if(!viewModel.loadedFirstPage){
-            rvScrollListener.loading.value = true
-            viewModel.loadFirst(100, 0, true, "S", "-modified", { rvScrollListener.loading.value = false }, { rvScrollListener.loading.value = false }) //TODO: implement noConnection callback
+            viewModel.loadFirst(50, 0, true, "S", "-modified",
+                    apiQueryCallback { isSuccessResponse, isFailure, response, error ->
+
+                    })
         }
 
         viewModel.rvPosition.observe(this){
             Log.i("rvPos", it!!.toString())
-            if(it!! != -1){
-                val viewAtPosition = rvLayoutManager.findViewByPosition(it!!)
+            if(it != -1){
+                val viewAtPosition = rvLayoutManager.findViewByPosition(it)
                 if (viewAtPosition == null || !rvLayoutManager.isViewPartiallyVisible(viewAtPosition, false, true)) {
-                    rv_images.post({ rvLayoutManager.scrollToPosition(it!!) })
+                    rv_images.post({ rvLayoutManager.scrollToPosition(it) })
                     viewModel.rvPosition.value = -1
                     Log.i("Gallery", "scrolled")
                 }
             }
-
         }
+
+        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
+        if(savedInstanceState != null){
+            rvLayoutManager.onRestoreInstanceState(savedInstanceState)
+        }
+
     }
 
     private inner class ImageGalleryAdapter(
@@ -121,17 +140,14 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
             val image = images[position]
             val imageView = holder.imageView
 
-            //Log.i("Preview", image.preview)
-            val url = GlideUrl(image.preview, LazyHeaders.Builder().addHeader("Authorization", "OAuth ${AccountRepo.token}").build())
             GlideApp.with(mContext)
-                    .load(url) //TODO: refactor
+                    .load(GlideUrl(image.preview, LazyHeaders.Builder().addHeader("Authorization", "OAuth ${AccountRepo.token}").build()))
                     .placeholder(R.drawable.ic_home_black_24dp) // TODO: find nice placeholder
                     .centerCrop()
                     .into(imageView)
         }
 
         override fun getItemCount(): Int {
-            //Log.i("Gallery", images.size.toString())
             return images.size
         }
 
@@ -150,21 +166,12 @@ class ImageGalleryFragment : BaseFragmentWithVM<ImageGalleryViewModel>() {
 
                     Log.i("GALLERY", "CLICKED: ${img.resourceId}")
 
-                    val iv = view.findViewById<ImageView>(R.id.iv_image)
 
                     activity.asMainActivity()!!.fragNavController.pushFragment(
                             ImageCarouselFragment.newInstance())
 
-                    //val intent = Intent(mContext, SpacePhotoActivity::class.java)
-                    //intent.putExtra(SpacePhotoActivity.EXTRA_SPACE_PHOTO, img)
-                    //startActivity(intent)
                 }
             }
         }
     }
-
-
-
-
-
 }

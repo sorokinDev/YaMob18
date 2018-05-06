@@ -11,7 +11,6 @@ import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.fragment_settings.*
 import ru.sorokin.dev.yamob2018.R
-import ru.sorokin.dev.yamob2018.model.repository.AccountRepo
 import ru.sorokin.dev.yamob2018.util.*
 import ru.sorokin.dev.yamob2018.view.base.BaseFragmentWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.SettingsViewModel
@@ -31,7 +30,7 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
         setHasOptionsMenu(true)
 
         viewModel.account.observe(this) {res ->
-            res?.singleOrNull{ it.token == AccountRepo.token && !isNullOrEmpty(it.id) }?.let {
+            res?.firstOrNull()?.let {
                 tv_username.text = it.login
                 if (!it.isAvatarEmpty) {
                     GlideApp
@@ -51,9 +50,13 @@ class SettingsFragment : BaseFragmentWithVM<SettingsViewModel>() {
                         bytesToGbs(it.totalSpace))
 
                 pb_available_space.progress = Math.max((it.usedSpace.toDouble() / it.totalSpace * 100).toInt(), 2)
-
             }
         }
+
+        viewModel.getDriveInfo(
+            apiQueryCallback { isSuccessResponse, isFailure, response, error ->  }
+        )
+        viewModel.getAccountInfo()
 
         btn_get_extra_space.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_get_extra_space))))

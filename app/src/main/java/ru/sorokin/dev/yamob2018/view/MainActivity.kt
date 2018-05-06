@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import ru.sorokin.dev.yamob2018.R
 import ru.sorokin.dev.yamob2018.Screens
 import ru.sorokin.dev.yamob2018.util.BottomNavigationViewBehavior
+import ru.sorokin.dev.yamob2018.util.apiQueryCallback
 import ru.sorokin.dev.yamob2018.util.observe
 import ru.sorokin.dev.yamob2018.view.base.BaseActivityWithVM
 import ru.sorokin.dev.yamob2018.viewmodel.AuthViewModel
@@ -28,10 +29,9 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
         try{
             fragNavController.popFragment()
         }catch(e: Exception){
+            //No more fragments to pop, finish activity
             this.finish()
         }
-
-
     }
 
     companion object {
@@ -44,7 +44,9 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
     val contentContainerId = R.id.content
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        Log.i("MainAct", "OnNavListener")
+        navigation.clearAnimation()
+        navigation.animate().translationY(0f).duration = 100
+
         viewModel.currentScreen.value = when(item.itemId){
             R.id.navigation_images -> Screens.IMAGES
             R.id.navigation_offline -> Screens.OFFLINE
@@ -52,15 +54,11 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
             else -> Screens.HOME
         }
 
-        navigation.clearAnimation()
-        navigation.animate().translationY(0f).duration = 100
-
         return@OnNavigationItemSelectedListener true
     }
 
     //Highlights item in bottom nav view
     fun setSelectedNavItem(itemN: Int){
-        Log.i("SelNav", itemN.toString())
         val menu = navigation.menu
         if(itemN < menu.size()) {
             menu.getItem(itemN).isChecked = true
@@ -100,6 +98,7 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
                         SettingsFragment.newInstance(),
                         AuthNeededFragment.newInstance()
                 ))
+                .selectedTabIndex(if(authViewModel.authState.value == AuthViewModel.COMPLETE_AUTH) 0 else 3)
                 .defaultTransactionOptions(FragNavTransactionOptions.newBuilder().transition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).build())
                 .build()
     }
@@ -159,30 +158,33 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
     //endregion
 
     lateinit var imageGalleryViewModel: ImageGalleryViewModel
+    fun initImageGalleryViewModel(){
+        imageGalleryViewModel = ViewModelProviders.of(this)[ImageGalleryViewModel::class.java]
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initAuthViewModel()
+        initImageGalleryViewModel()
+
         initNavigation(savedInstanceState)
 
-        initAuthViewModel()
-
-        imageGalleryViewModel = ViewModelProviders.of(this)[ImageGalleryViewModel::class.java]
         authViewModel.authState.observe(this){
             when(it){
                 AuthViewModel.NO_AUTH -> viewModel.navTo(Screens.AUTH_NEEDED)
                 AuthViewModel.TOKEN_ONLY -> viewModel.navTo(Screens.AUTH_NEEDED)
                 AuthViewModel.COMPLETE_AUTH -> {
-                    if(viewModel.needGoHome){
-                        viewModel.navTo(Screens.HOME)
-                    }
+                    if(viewModel.needGoHome) viewModel.navTo(Screens.HOME)
+                    imageGalleryViewModel.loadFirst(100, 0, true, "S", "-modified",
+                        apiQueryCallback { isSuccessResponse, isFailure, response, error ->
+
+                        }
+                    )
                 }
             }
-        }
-
-        if (intent != null && intent.data != null) {
-            return
         }
 
     }

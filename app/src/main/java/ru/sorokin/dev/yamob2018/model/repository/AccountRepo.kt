@@ -1,5 +1,6 @@
 package ru.sorokin.dev.yamob2018.model.repository
 
+import android.util.Log
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 import io.realm.Realm
@@ -9,6 +10,8 @@ import retrofit2.Response
 import ru.sorokin.dev.yamob2018.DriveApp
 import ru.sorokin.dev.yamob2018.Pref
 import ru.sorokin.dev.yamob2018.model.entity.AccountInfo
+import ru.sorokin.dev.yamob2018.model.entity.DriveImage
+import ru.sorokin.dev.yamob2018.model.entity.DriveInfo
 import ru.sorokin.dev.yamob2018.model.rest.BaseCallback
 import ru.sorokin.dev.yamob2018.model.rest.Providers
 import ru.sorokin.dev.yamob2018.util.isNullOrEmpty
@@ -27,7 +30,6 @@ class AccountRepo {
     var realm : Realm = Realm.getDefaultInstance()
 
     fun saveAuth(token: String){
-
         DriveApp.preferences.edit().putString(Pref.TOKEN, token).apply()
         realm.executeTransaction {
             realm.insertOrUpdate(AccountInfo(token = token))
@@ -49,11 +51,10 @@ class AccountRepo {
 
         accountApi.getAccountInfo().enqueue(object : BaseCallback<AccountInfo>() {
             override val toastOnFailure: String? = null
-            override val snackOnFailure: String? = "No internet"
 
             override fun onSucceessResponse(call: Call<AccountInfo>, response: Response<AccountInfo>) {
                 response.body()?.let { acc ->
-                    //Log.i("accRepo", "get acc OnSuccess response")
+                    Log.i("accRepo", "get acc OnSuccess response")
 
                     acc.token = AccountRepo.token!!
                     realm.executeTransaction {realm ->
@@ -76,10 +77,10 @@ class AccountRepo {
     }
 
     fun deleteUserData(){
-        //TODO: make good signing out
         realm.executeTransaction {
-            it.deleteAll()
-
+            it.delete(AccountInfo::class.java)
+            it.delete(DriveInfo::class.java)
+            it.delete(DriveImage::class.java)
         }
     }
 }

@@ -10,4 +10,5 @@
     <string name="get_extra_space">Получить больше места</string>
     <string name="available_space">Свободно: %1$.2f из %2$.2f ГБ</string>
     <string name="title_auth_failure">Авторизация</string>
+    <string name="cant_load_data">Не удалось получить данные</string>
 </resources>

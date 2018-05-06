@@ -5,10 +5,9 @@ import android.support.v7.widget.RecyclerView
 
 
 abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutManager) : RecyclerView.OnScrollListener() {
-    var visibleThreshold = 100
+    var visibleThreshold = 50
     var previousTotalItemCount = 0
-    var loading = mutableLiveDataWithValue(false)
-
+    var loadedLastTime = 1
 
     fun getLastVisibleItem(lastVisibleItemPositions: IntArray): Int {
         var maxSize = 0
@@ -29,16 +28,8 @@ abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutMa
 
         lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-        /*if (totalItemCount < previousTotalItemCount) {
-            this.currentOffset = this.startingOffset
-            this.previousTotalItemCount = totalItemCount
-            if (totalItemCount == 0) {
-                this.loading = true
-            }
-        }*/
-
-        if (!loading.value!! && lastVisibleItemPosition + visibleThreshold > totalItemCount) {
-            if(previousTotalItemCount != totalItemCount){
+        if (!isLoading() && lastVisibleItemPosition + visibleThreshold > totalItemCount) {
+            if(loadedLastTime > 0){
                 beforeLoadMore(0, totalItemCount, view)
             }
         }
@@ -50,22 +41,23 @@ abstract class EndlessRecyclerViewScrollListener(val layoutManager: GridLayoutMa
 
     fun resetState() {
         this.previousTotalItemCount = 0
-        this.loading.value = false
+
     }
 
     fun beforeLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?){
-        loading.value = true
+
         previousTotalItemCount = totalItemsCount
 
         loadMore(page, totalItemsCount, view)
     }
 
     fun afterLoadMore(){
-        loading.value = false
+
     }
 
 
     abstract fun loadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
+    abstract fun isLoading(): Boolean
 
 
 }
