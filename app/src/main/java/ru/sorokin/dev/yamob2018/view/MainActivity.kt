@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.annotation.Nullable
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CoordinatorLayout
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.util.Log
 import com.ncapdevi.fragnav.FragNavController
@@ -49,7 +48,7 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
 
         viewModel.currentScreen.value = when(item.itemId){
             R.id.navigation_images -> Screens.IMAGES
-            R.id.navigation_offline -> Screens.OFFLINE
+            //R.id.navigation_offline -> Screens.OFFLINE
             R.id.navigation_settings -> Screens.SETTINGS
             else -> Screens.HOME
         }
@@ -69,9 +68,11 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
     fun onCurrentScreenChanged(it: String) {
         val tabN = when(it) {
             Screens.IMAGES -> 0
-            Screens.OFFLINE -> 1
+            Screens.SETTINGS -> 1
+            Screens.AUTH_NEEDED -> 2
+            /*Screens.OFFLINE -> 1
             Screens.SETTINGS -> 2
-            Screens.AUTH_NEEDED -> 3
+            Screens.AUTH_NEEDED -> 3*/
             Screens.HOME -> 0
             else -> -1
         }
@@ -94,11 +95,11 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
                 .newBuilder(savedInstanceState, supportFragmentManager, contentContainerId)
                 .rootFragments(listOf(
                         ImageGalleryFragment.newInstance(),
-                        Fragment(),
+                        //Fragment(),
                         SettingsFragment.newInstance(),
                         AuthNeededFragment.newInstance()
                 ))
-                .selectedTabIndex(if(authViewModel.authState.value == AuthViewModel.COMPLETE_AUTH) 0 else 3)
+                .selectedTabIndex(if(authViewModel.authState.value == AuthViewModel.COMPLETE_AUTH) 0 else 2)
                 .defaultTransactionOptions(FragNavTransactionOptions.newBuilder().transition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).build())
                 .build()
     }

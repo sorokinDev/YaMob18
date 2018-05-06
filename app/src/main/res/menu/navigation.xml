@@ -6,10 +6,10 @@
         android:icon="@drawable/ic_photo_library_24_b"
         android:title="@string/title_all_photos" />
 
-    <item
+    <!-- <item
         android:id="@+id/navigation_offline"
         android:icon="@drawable/ic_offline_24_b"
-        android:title="@string/title_offline" />
+        android:title="@string/title_offline" /> -->
 
     <item
         android:id="@+id/navigation_settings"

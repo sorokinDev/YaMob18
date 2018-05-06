@@ -28,11 +28,11 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/btn_trigger_offline"
+                android:id="@+id/btn_save_to_gallery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_offline_en_24_w" />
+                android:src="@drawable/ic_file_download_24_w" />
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 </FrameLayout>
