@@ -45,8 +45,13 @@ class AccountRepo {
             return realm.where(AccountInfo::class.java).findAllAsync()
         }
 
+        if(isNullOrEmpty(AccountRepo.token)){
+            return getLocalAccount()
+        }
+
         accountApi.getAccountInfo().enqueue(object : BaseCallback<AccountInfo>() {
             override val toastOnFailure = DriveApp.INSTANCE.resources.getString(R.string.cant_load_data)
+
 
             override fun onSucceessResponse(call: Call<AccountInfo>, response: Response<AccountInfo>) {
                 response.body()?.let { acc ->

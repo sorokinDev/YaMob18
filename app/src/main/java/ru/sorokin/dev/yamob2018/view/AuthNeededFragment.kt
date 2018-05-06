@@ -38,7 +38,7 @@ class AuthNeededFragment : BaseFragmentWithVM<AuthNeededViewModel>() {
             it?.let {
                 when(it){
                     AuthViewModel.NO_AUTH -> viewModel.currentState.value = AuthNeededViewModel.STATE_NO_AUTH
-                    AuthViewModel.TOKEN_ONLY -> { viewModel.currentState.value = AuthNeededViewModel.STATE_TOKEN_ONLY; activity?.asMainActivity()?.authViewModel?.getAccountInfo() }
+                    AuthViewModel.TOKEN_ONLY -> { viewModel.currentState.value = AuthNeededViewModel.STATE_TOKEN_ONLY}
                     AuthViewModel.COMPLETE_AUTH -> viewModel.currentState.value = AuthNeededViewModel.STATE_NO_AUTH
                     else -> {}
                 }

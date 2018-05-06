@@ -99,7 +99,7 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
                         SettingsFragment.newInstance(),
                         AuthNeededFragment.newInstance()
                 ))
-                .selectedTabIndex(if(authViewModel.authState.value == AuthViewModel.COMPLETE_AUTH) 0 else 2)
+                //.selectedTabIndex(if(authViewModel.authState.value == AuthViewModel.COMPLETE_AUTH) 0 else 2)
                 .defaultTransactionOptions(FragNavTransactionOptions.newBuilder().transition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).build())
                 .build()
     }
@@ -185,10 +185,7 @@ class MainActivity : BaseActivityWithVM<MainViewModel>() {
                 AuthViewModel.TOKEN_ONLY -> viewModel.navTo(Screens.AUTH_NEEDED)
                 AuthViewModel.COMPLETE_AUTH -> {
                     if(viewModel.needGoHome) viewModel.navTo(Screens.HOME)
-                    imageGalleryViewModel.loadFirst(100, 0, true, "S", "-modified",
-                        apiQueryCallback { isSuccessResponse, isFailure, response, error ->
-                        }
-                    )
+                    imageGalleryViewModel.loadNewestFirstPage(apiQueryCallback { isSuccessResponse, isFailure, response, error -> })
                 }
             }
         }

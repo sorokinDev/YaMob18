@@ -20,6 +20,7 @@ class AuthViewModel: BaseViewModel() {
     val authState = mutableLiveDataWithValue("")
     var accounts = RealmLiveData(accountRepo.getAccount(false))
 
+
     init {
         if(isNullOrEmpty(AccountRepo.token)){
             authState.value = AuthViewModel.NO_AUTH
@@ -51,17 +52,13 @@ class AuthViewModel: BaseViewModel() {
         if (yandexAuthToken != null) {
             authState.value = AuthViewModel.TOKEN_ONLY
             accountRepo.saveAuth(yandexAuthToken.value)
-            //accountRepo.getAccount(true)
+            accountRepo.getAccount(true)
         }else{
             authState.value = AuthViewModel.NO_AUTH
         }
     }
 
     fun getAccountInfo(){
-        accountRepo.getAccount(true)
-    }
-
-    fun loadUserInfo() {
         accountRepo.getAccount(true)
     }
 

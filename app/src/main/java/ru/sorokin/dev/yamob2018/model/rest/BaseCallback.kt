@@ -22,6 +22,8 @@ abstract class BaseCallback<T> : Callback<T> {
             onSucceessResponse(call!!, response)
         }else if(response != null){
             Log.i("Response", response.code().toString())
+            Log.i("Response", response.body().toString())
+            Log.i("Response", response.headers().toString())
             if(response.code() == 401){
                 AccountRepo().signOut()
             }
